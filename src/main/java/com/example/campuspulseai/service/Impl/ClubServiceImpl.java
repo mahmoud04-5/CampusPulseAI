@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Data
+
 @RequiredArgsConstructor
 @Service
 public class ClubServiceImpl implements IClubService {

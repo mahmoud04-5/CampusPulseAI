@@ -8,13 +8,14 @@ import com.example.campuspulseai.service.IClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@RequiredArgsConstructor
 @RestController
 @Data
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
@@ -22,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/clubs")
 public class ClubController {
 
-    @Autowired
+
     private final IClubService clubService;
 
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
