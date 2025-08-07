@@ -20,7 +20,7 @@ public class Event {
     private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "clubId", nullable = false)
+    @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
     @Column(nullable = false, length = 255)
@@ -29,7 +29,7 @@ public class Event {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(nullable = false)
     private Timestamp startDate;
 
     @Column(nullable = false, length = 255)
@@ -44,7 +44,7 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
-    @Column(name = "isActive", nullable = false)
+    @Column(nullable = false)
     private boolean isActive = true;
 
     @CreationTimestamp

@@ -32,7 +32,7 @@ public class Club {
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
-    @Column(name = "isActive", nullable = false)
+    @Column(nullable = false)
     private boolean isActive = true;
 
     @CreationTimestamp
