@@ -25,7 +25,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public AuthenticationResponse login(AuthenticationRequest authRequest) {
-        return null; //TODO
+        return authenticationService.login(authRequest);
     }
 
 }
