@@ -1,11 +1,11 @@
 package com.example.campuspulseai.service.Impl;
 
-import com.example.campuspulseai.common.mapper.AuthenticationMapper;
 import com.example.campuspulseai.domain.DTO.Request.AuthenticationRequest;
 import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
 import com.example.campuspulseai.domain.DTO.Response.AuthenticationResponse;
 import com.example.campuspulseai.service.IAuthenticationService;
 import com.example.campuspulseai.southBound.entity.User;
+import com.example.campuspulseai.southBound.mapper.AuthenticationMapper;
 import com.example.campuspulseai.southBound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

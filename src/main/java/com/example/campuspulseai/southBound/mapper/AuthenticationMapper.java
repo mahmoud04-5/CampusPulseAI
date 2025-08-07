@@ -1,4 +1,4 @@
-package com.example.campuspulseai.common.mapper;
+package com.example.campuspulseai.southBound.mapper;
 
 import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
 import com.example.campuspulseai.southBound.entity.Group;
