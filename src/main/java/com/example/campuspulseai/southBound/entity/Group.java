@@ -20,7 +20,7 @@ public class Group {
 
     private String name;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "group_roles",
             joinColumns = @JoinColumn(name = "group_id"),

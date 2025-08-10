@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class EventController {
         return eventService.updateEvent(createEventRequest);
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Get event by ID", description = "Retrieves an event by its ID.")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
