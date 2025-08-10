@@ -47,7 +47,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         User user = userRepository.findByEmail(authenticationRequest.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticationRequest.getEmail()));
 
-        String jwtToken = jwtService.generateToken(new HashMap<>(),user);
+        HashMap claims = new HashMap<>();
+        claims.put("authorities", user.getAuthorities());
+
+        String jwtToken = jwtService.generateToken(claims, user);
 
         return new AuthenticationResponse(jwtToken);
     }
