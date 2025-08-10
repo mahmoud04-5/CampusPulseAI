@@ -49,7 +49,8 @@ public class EventController {
         eventService.deleteEventById(id);
     }
 
-    @Operation(summary = "Get all events", description = "Retrieves a list of all events, offering options for pagination and filtering.")
+    @Operation(summary = "Get all events",
+            description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> getAllEvents() {
@@ -74,21 +75,6 @@ public class EventController {
         return eventService.suggestEventsToCreate();
     }
 
-    @Operation(summary = "Get events by club ID", description = "Retrieves a list of events associated with a specific club.")
-    @GetMapping("/club/{clubId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getEventsByClubId(@PathVariable Long clubId) {
-        // Logic to get events by club ID
-        return eventService.getEventsByClubId(clubId);
-    }
-
-    @Operation(summary = "Get events created by the authenticated organizer", description = "Retrieves a list of events created by the currently authenticated club organizer.")
-    @GetMapping("/created")
-    @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getMyEvents() {
-        // Logic to get events created by the authenticated user
-        return eventService.getMyEvents();
-    }
 
     @Operation(summary = "Get events the user is attending", description = "Retrieves a list of events that the currently authenticated user is attending.")
     @GetMapping("/attending")
@@ -99,7 +85,7 @@ public class EventController {
     }
 
     @Operation(summary = " Attend an event", description = "Allows the currently authenticated user to RSVP for an event by its ID.")
-    @PostMapping("/RSVP/{eventId}")
+    @PostMapping("/rsvp/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public void attendEvent(@PathVariable Long eventId) {
         // Logic to mark the user as attending the event
@@ -107,7 +93,7 @@ public class EventController {
     }
 
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
-    @DeleteMapping("/RSVP/{eventId}")
+    @DeleteMapping("/rsvp/{eventId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unattendEvent(@PathVariable Long eventId) {
         eventService.unattendEvent(eventId);

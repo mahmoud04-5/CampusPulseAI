@@ -20,7 +20,7 @@ public class QuestionChoices {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questionId", nullable = false)
+    @JoinColumn(name = "question_id", nullable = false)
     private SurveyQuestion question;
 
     @Column(columnDefinition = "TEXT")
