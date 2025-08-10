@@ -7,7 +7,6 @@ import com.example.campuspulseai.service.IAuthenticationService;
 import com.example.campuspulseai.southBound.entity.User;
 import com.example.campuspulseai.southBound.mapper.AuthenticationMapper;
 import com.example.campuspulseai.southBound.repository.IUserRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-
 
 
 @RequiredArgsConstructor
@@ -33,6 +31,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Transactional
     public void register(RegisterRequest registerRequest) throws Exception {
 
+        registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         User user = authenticationMapper.mapToUser(registerRequest);
         userRepository.save(user);
     }

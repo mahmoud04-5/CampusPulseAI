@@ -60,21 +60,6 @@ public interface IEventService {
     List<GetEventResponse> suggestEventsToCreate();
 
     /**
-     * Retrieves all events for a specific club
-     *
-     * @param clubId The club ID
-     * @return List of event responses
-     */
-    List<GetEventResponse> getEventsByClubId(Long clubId);
-
-    /**
-     * Retrieves all events created by the authenticated organizer
-     *
-     * @return List of event responses
-     */
-    List<GetEventResponse> getMyEvents();
-
-    /**
      * Retrieves all events the authenticated user is attending
      *
      * @return List of event responses

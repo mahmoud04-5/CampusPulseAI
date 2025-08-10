@@ -2,7 +2,6 @@ package com.example.campuspulseai.southBound.mapper;
 
 import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
 import com.example.campuspulseai.southBound.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

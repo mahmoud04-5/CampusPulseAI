@@ -4,11 +4,9 @@ import com.example.campuspulseai.domain.DTO.Request.CreateClubRequest;
 import com.example.campuspulseai.domain.DTO.Response.CreateClubResponse;
 import com.example.campuspulseai.domain.DTO.Response.GetClubResponse;
 import com.example.campuspulseai.service.IClubService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -25,17 +23,11 @@ public class ClubServiceImpl implements IClubService {
     }
 
     @Override
-    public List<GetClubResponse> getAllClubs() {
-        return List.of();
-    }
-
-    @Override
     public void deleteClubById(Long id) {
-
     }
 
     @Override
-    public List<GetClubResponse> searchClubs(String query) {
-        return List.of();
+    public Page<GetClubResponse> getClubs(String query, int page, int size) {
+        return null;
     }
 }
