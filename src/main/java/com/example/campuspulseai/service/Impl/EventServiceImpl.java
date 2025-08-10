@@ -46,16 +46,6 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> getEventsByClubId(Long clubId) {
-        return List.of();
-    }
-
-    @Override
-    public List<GetEventResponse> getMyEvents() {
-        return List.of();
-    }
-
-    @Override
     public List<GetEventResponse> getEventsAttending() {
         return List.of();
     }
