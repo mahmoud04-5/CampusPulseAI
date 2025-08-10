@@ -1,32 +1,21 @@
 package com.example.campuspulseai.southBound.mapper;
 
 import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
-import com.example.campuspulseai.southBound.entity.Group;
 import com.example.campuspulseai.southBound.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-@Component
-@RequiredArgsConstructor
-public class AuthenticationMapper {
-    private final PasswordEncoder passwordEncoder;
 
-    public User mapToUser(RegisterRequest registerRequest) {
-        return new User(
-                null,
-                registerRequest.getFirstName(),
-                registerRequest.getLastName(),
-                registerRequest.getEmail(),
-                passwordEncoder.encode(registerRequest.getPassword()),
-                true,
-                setGroup(),
-                null,
-                null
-        );
-    }
+@Mapper(componentModel = "spring")
+public interface AuthenticationMapper {
 
-    private Group setGroup() {
-        return new Group(1L, "GROUP_STUDENTS", null);
-    }
+    AuthenticationMapper INSTANCE = Mappers.getMapper(AuthenticationMapper.class);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "isActive", constant = "true")
+    @Mapping(target = "group", expression = "java(new com.example.campuspulseai.southBound.entity.Group(1L, \"GROUP_STUDENTS\", null))")
+    User mapToUser(RegisterRequest registerRequest);
 }
+
