@@ -7,17 +7,14 @@ import com.example.campuspulseai.domain.DTO.Response.GetClubResponse;
 import com.example.campuspulseai.service.IClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
-@Data
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
 
 @RequestMapping("/api/clubs")
@@ -29,7 +26,7 @@ public class ClubController {
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    CreateClubResponse createClub(CreateClubRequest createClubRequest) {
+    CreateClubResponse createClub(@Valid @RequestBody CreateClubRequest createClubRequest) {
         return clubService.createClub(createClubRequest);
     }
 
@@ -40,12 +37,6 @@ public class ClubController {
         return clubService.getClubById(id);
     }
 
-    @Operation(summary = "Get all clubs", description = "Retrieves a list of all clubs")
-    @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    List<GetClubResponse> getAllClubs() {
-        return clubService.getAllClubs();
-    }
 
     @Operation(summary = "Delete club by ID", description = "Deletes a club by its ID.")
     @DeleteMapping("/{id}")
@@ -54,9 +45,16 @@ public class ClubController {
         clubService.deleteClubById(id);
     }
 
-    @GetMapping("/search")
+
+    @Operation(summary = "Get clubs / search clubs",
+            description = "Retrieves a paginated list of clubs. Optionally filters by a search query.")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<GetClubResponse> searchClubs(@RequestParam("query") String query) {
-        return clubService.searchClubs(query);
+    public Page<GetClubResponse> getClubs(
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return clubService.getClubs(query, page, size);
     }
 }
+
