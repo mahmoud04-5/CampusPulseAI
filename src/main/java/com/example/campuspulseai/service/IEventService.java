@@ -13,7 +13,7 @@ public interface IEventService {
      * @param createEventRequest The event details
      * @return The created event response
      */
-    CreateEventResponse createEvent(CreateEventRequest createEventRequest);
+    CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception;
 
     /**
      * Updates an existing event
