@@ -6,6 +6,7 @@ import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,10 +22,11 @@ public class EventController {
 
     private final IEventService eventService;
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Create a new event", description = "Creates a new event with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
+    public CreateEventResponse createEvent(@Valid @RequestBody CreateEventRequest createEventRequest) throws Exception {
         return eventService.createEvent(createEventRequest);
     }
 

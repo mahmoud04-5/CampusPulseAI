@@ -5,9 +5,16 @@ import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
 import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
+import com.example.campuspulseai.southBound.entity.Club;
+import com.example.campuspulseai.southBound.entity.Event;
 import com.example.campuspulseai.southBound.entity.User;
+import com.example.campuspulseai.southBound.mapper.EventMapper;
+import com.example.campuspulseai.southBound.repository.IClubRepository;
+import com.example.campuspulseai.southBound.repository.IEventRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,11 +23,19 @@ import java.util.List;
 public class EventServiceImpl implements IEventService {
 
     private final IAuthUtils authUtils;
+    private final IEventRepository eventRepository;
+    private final EventMapper eventMapper;
+    private final IClubRepository clubRepository;
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
         User user = authUtils.getAuthenticatedUser();
-        return null;
+        Event event = eventMapper.mapToClub(createEventRequest);
+        Club club = clubRepository.findByOwnerId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
+        event.setClub(club);
+        Event createdEvent = eventRepository.save(event);
+        return eventMapper.mapToCreateEventResponse(event);
     }
 
     @Override

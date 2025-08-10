@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Setter
@@ -30,8 +29,8 @@ public class CreateEventRequest {
     private int capacity;
 
     @com.example.campuspulseai.domain.validation.ValidCategory
-    @NotEmpty(message = "Event category is required")
-    private String eventCategory;
+    @NotNull(message = "Event category is required")
+    private String category;
 
 
     private String imageUrl;
