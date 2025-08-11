@@ -1,4 +1,4 @@
-package com.example.campuspulseai.common.Config;
+package com.example.campuspulseai.common.config;
 
 import com.example.campuspulseai.service.IJwtService;
 import jakarta.servlet.FilterChain;

@@ -1,4 +1,4 @@
-package com.example.campuspulseai.common.Config;
+package com.example.campuspulseai.common.config;
 
 import com.example.campuspulseai.southBound.repository.IUserRepository;
 import org.springframework.context.annotation.Bean;
