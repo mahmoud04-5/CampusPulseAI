@@ -13,7 +13,7 @@ import java.util.List;
 @Tag(name = "Survey", description = "Survey Management API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/survey")
+@RequestMapping("/api/surveys")
 public class SurveyController {
     private final ISurveyService surveyService;
 
@@ -26,7 +26,7 @@ public class SurveyController {
 
     @Operation(summary = "Submit Survey", description = "Submits the user's responses to the survey.")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/submit")
+    @PostMapping()
     public void submitSurvey(List<SurveyQuestionDTO> surveyResponses) {
         surveyService.submitSurveyResponse(surveyResponses);
     }
