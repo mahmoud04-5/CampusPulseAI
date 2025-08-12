@@ -22,6 +22,16 @@ import javax.sql.DataSource;
 @Configuration
 public class SecurityConfig {
 
+    public static final String AUTH_BASE = "/api/auth/**";
+    public static final String AUTH_ROOT = "/api/auth/";
+    public static final String DOCS_ROOT = "/docs/";
+    public static final String DOCS_SINGLE = "/docs";
+    public static final String SWAGGER_UI = "/swagger-ui/";
+    public static final String SWAGGER_HTML = "/swagger-ui.html";
+    public static final String API_DOCS = "/v3/api-docs/";
+    public static final String WEBJARS = "/webjars/";
+    public static final String SWAGGER_RESOURCES = "/swagger-recources/";
+
     private final IUserRepository userRepository;
 
     public SecurityConfig(IUserRepository userRepository) {
@@ -76,8 +86,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(configurer ->
                 configurer
-                        .requestMatchers("/api/auth/**", "docs/**", "/swagger-ui/**", "/v3/api-docs/**", "/docs"
-                                , "webjars/**", "/swagger-recources/**", "/swagger-ui.html", "/api/auth/**").permitAll()
+                        .requestMatchers(
+                                AUTH_ROOT,
+                                DOCS_ROOT,
+                                SWAGGER_UI,
+                                API_DOCS,
+                                DOCS_SINGLE,
+                                WEBJARS,
+                                SWAGGER_RESOURCES,
+                                SWAGGER_HTML,
+                                AUTH_BASE
+                        ).permitAll()
                         .anyRequest().authenticated()
         );
 
@@ -89,7 +108,6 @@ public class SecurityConfig {
                 exceptionHanling
                         .authenticationEntryPoint(authenticationEntryPoint()));
 
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         return http.build();
     }
