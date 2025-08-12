@@ -13,4 +13,5 @@ public class SurveyQuestionDTO {
     private long questionId;
     private String questionText;
     private List<String> choices;
+    private List<Long> selectedChoicesIds;
 }

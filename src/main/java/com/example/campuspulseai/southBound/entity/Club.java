@@ -29,6 +29,9 @@ public class Club {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    private String clubCategory;
+
+
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
