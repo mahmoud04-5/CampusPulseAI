@@ -36,7 +36,7 @@ public class Event {
     private String location;
 
     @Column(nullable = false)
-    private int capacity;
+    private Integer capacity;
 
     @Column(nullable = false, length = 50)
     private String category;
@@ -45,7 +45,7 @@ public class Event {
     private String imageUrl;
 
     @Column(nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @CreationTimestamp
     @Column(nullable = false)
