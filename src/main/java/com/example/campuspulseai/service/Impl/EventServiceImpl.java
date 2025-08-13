@@ -32,8 +32,7 @@ public class EventServiceImpl implements IEventService {
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
         User user = authUtils.getAuthenticatedUser();
         Event event = eventMapper.mapToClub(createEventRequest);
-        Club club = clubRepository.findByOwnerId(user.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
+        Club club = getCluByOwnerId(user.getId());
         event.setClub(club);
         Event createdEvent = eventRepository.save(event);
         return eventMapper.mapToCreateEventResponse(createdEvent);
@@ -118,5 +117,10 @@ public class EventServiceImpl implements IEventService {
                 event.getId(), event.getTitle(), event.getClub(), event.getDescription(), null, null
         );
 
+    }
+
+    private Club getCluByOwnerId(Long ownerId) {
+        return clubRepository.findByOwnerId(ownerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
     }
 }
