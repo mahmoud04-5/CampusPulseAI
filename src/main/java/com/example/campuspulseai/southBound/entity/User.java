@@ -52,8 +52,10 @@ public class User implements UserDetails {
     private List<SurveyUserAnswers> userAnswers;
 
 
-    @Column(nullable = false)
-    private boolean surveyCompleted = false;
+
+
+    @OneToMany(mappedBy = "user")
+    private List<UserEvent> userAttendedEvents;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

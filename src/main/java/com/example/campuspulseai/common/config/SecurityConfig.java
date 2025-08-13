@@ -24,13 +24,13 @@ public class SecurityConfig {
 
     public static final String AUTH_BASE = "/api/auth/**";
     public static final String AUTH_ROOT = "/api/auth/";
-    public static final String DOCS_ROOT = "/docs/";
+    public static final String DOCS_ROOT = "docs/**";
     public static final String DOCS_SINGLE = "/docs";
-    public static final String SWAGGER_UI = "/swagger-ui/";
+    public static final String SWAGGER_UI = "/swagger-ui/**";
     public static final String SWAGGER_HTML = "/swagger-ui.html";
-    public static final String API_DOCS = "/v3/api-docs/";
+    public static final String API_DOCS = "/v3/api-docs/**";
     public static final String WEBJARS = "/webjars/";
-    public static final String SWAGGER_RESOURCES = "/swagger-recources/";
+    public static final String SWAGGER_RESOURCES = "/swagger-resources/**";
 
     private final IUserRepository userRepository;
 
@@ -84,7 +84,8 @@ public class SecurityConfig {
     //this bean is used to configure the security filter chain to apply the security rules for each endpoint and general security rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(configurer ->
+        http.   csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(configurer ->
                 configurer
                         .requestMatchers(
                                 AUTH_ROOT,
@@ -97,12 +98,11 @@ public class SecurityConfig {
                                 SWAGGER_HTML,
                                 AUTH_BASE
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
         );
 
         http.httpBasic(Customizer.withDefaults());
 
-        http.csrf(csrf -> csrf.disable());
 
         http.exceptionHandling(exceptionHanling ->
                 exceptionHanling

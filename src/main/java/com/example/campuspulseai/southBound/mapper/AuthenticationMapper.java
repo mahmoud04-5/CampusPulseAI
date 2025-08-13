@@ -24,7 +24,7 @@ public class AuthenticationMapper {
                 null,
                 null,
                 null,
-                false
+                null
         );
     }
 

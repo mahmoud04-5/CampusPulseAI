@@ -47,7 +47,7 @@ public class EventController {
     public List<GetEventResponse> getAllEvents() {
         // Logic to get all events
         //TODO: Implement pagination!, add option to filter by date, location, etc.
-        return eventService.getAllEvents();
+        return eventService.getAllEventsForCurrentUser();
     }
 
     @Operation(summary = "Get event details", description = "Retrieves detailed info for a specific event by its ID.")
@@ -91,22 +91,35 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> getEventsAttending() {
         // Logic to get events the user is attending
-        return eventService.getEventsAttending();
+        return eventService.getAllEventsForCurrentUser();
     }
 
     @Operation(summary = " Attend an event", description = "Allows the currently authenticated user to RSVP for an event by its ID.")
     @PostMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.OK)
-    public void attendEvent(@PathVariable Long eventId) {
-        // Logic to mark the user as attending the event
-        eventService.attendEvent(eventId);
+    public ResponseEntity<Void> attendEvent(@PathVariable Long eventId) {
+
+            eventService.attendEvent(eventId);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+
     }
 
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
     @DeleteMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unattendEvent(@PathVariable Long eventId) {
-        eventService.unattendEvent(eventId);
+    public ResponseEntity<Void> unattendEvent(@PathVariable Long eventId) {
+        try {
+            eventService.unattendEvent(eventId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Event not found")) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else if (e.getMessage().contains("not attending")) { // Add custom logic if needed
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")
@@ -121,8 +134,8 @@ public class EventController {
     @GetMapping("/upcoming")
     public ResponseEntity<Map<String, Object>> getEvents(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dateTime,
-            @RequestParam(required = false) String label) {
-        List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, label);
+            @RequestParam(required = false) String category) {
+        List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, category);
         Map<String, Object> response = new HashMap<>();
         response.put("upcomingEvents", upcomingEvents);
         response.put("message", upcomingEvents.isEmpty() ? "No upcoming events found" : "Upcoming events found");

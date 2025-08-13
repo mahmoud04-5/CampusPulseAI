@@ -17,9 +17,9 @@ public class SurveyUserAnswers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "question_id", referencedColumnName = "id")
-    private SurveyQuestion surveyQuestion;
+//    @ManyToOne
+//    @JoinColumn(name = "question_id", referencedColumnName = "id")
+//    private SurveyQuestion surveyQuestion;
 
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
@@ -32,20 +32,20 @@ public class SurveyUserAnswers {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+//    @Column(nullable = false)
+//    private LocalDateTime updatedAt = LocalDateTime.now();
 
     //private String categoryAnswer;
-    private String categoryAnswer;
+   // private String categoryAnswer;
 
     public void setUser(User user) {
         this.user = user;
 
     }
 
-    public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
-        this.surveyQuestion =surveyQuestion;
-    }
+//    public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
+//        this.surveyQuestion =surveyQuestion;
+//    }
     public void setChoice(QuestionChoices choice) {
         this.choice = choice;
     }
@@ -54,9 +54,9 @@ public class SurveyUserAnswers {
         return id;
     }
 
-    public SurveyQuestion getSurveyQuestion() {
-        return surveyQuestion;
-    }
+//    public SurveyQuestion getSurveyQuestion() {
+//        return surveyQuestion;
+//    }
 
     public User getUser() {
         return user;
@@ -70,7 +70,5 @@ public class SurveyUserAnswers {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.service.IClubRecommendationService;
+import com.example.campuspulseai.service.ISurveyService;
 import com.example.campuspulseai.southBound.entity.Club;
 import com.example.campuspulseai.southBound.entity.QuestionChoices;
 import com.example.campuspulseai.southBound.entity.User;
@@ -20,13 +21,14 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
     private final IUserRepository userRepository;
     private final IClubRepository clubRepository;
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
+    private final ISurveyService surveyService;
 
 
     @Override
     public List<Club> getRecommendationsForUser(Long userId) {
         User user= userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
-        if (!user.isSurveyCompleted()) {
+        if (!surveyService.isSurveyCompleted()) {
             return List.of(); // No recommendations
         }
 
