@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: CampusPulseAi
+
+  jwt:
+    secret: 784478f2757b1596b7b5013f61a5302401d077e21bed3a51558d423e02381c83
+    expiration: 86400000 # 1 day in ms
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/campuspulseai-local  #jdbc:postgresql://localhost:3307/campus_pulse
+    username: postgres
+    password: qeema**123 #postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /docs
+
+
