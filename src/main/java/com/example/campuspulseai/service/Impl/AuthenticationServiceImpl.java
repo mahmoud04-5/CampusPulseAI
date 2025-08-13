@@ -5,7 +5,7 @@ import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
 import com.example.campuspulseai.domain.DTO.Response.AuthenticationResponse;
 import com.example.campuspulseai.service.IAuthenticationService;
 import com.example.campuspulseai.southBound.entity.User;
-import com.example.campuspulseai.southBound.mapper.AuthenticationMapper;
+import com.example.campuspulseai.southBound.mapper.AuthMapper;
 import com.example.campuspulseai.southBound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +23,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationMapper authenticationMapper;
+    private final AuthMapper authenticationMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtServiceImpl jwtService;
 

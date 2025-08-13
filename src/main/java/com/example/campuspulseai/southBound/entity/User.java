@@ -1,9 +1,7 @@
 package com.example.campuspulseai.southBound.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,11 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -37,8 +35,9 @@ public class User implements UserDetails {
 
     private Boolean isActive = true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_group", referencedColumnName = "id", nullable = false)
+    @ToString.Exclude
     private Group group;
 
     @CreationTimestamp
@@ -48,12 +47,12 @@ public class User implements UserDetails {
     private Timestamp updatedAt;
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SurveyUserAnswers> userAnswers;
-
-
-    @Column(nullable = false)
-    private boolean surveyCompleted = false;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<SurveyUserAnswers> userAnswers;
+//
+//
+//    @Column(nullable = false)
+//    private boolean surveyCompleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,8 +66,8 @@ public class User implements UserDetails {
         return email;
     }
 
-    public List<SurveyUserAnswers> getSurveyUserAnswers() {
-        return userAnswers;
-    }
+//    public List<SurveyUserAnswers> getSurveyUserAnswers() {
+//        return userAnswers;
+//    }
 }
 
