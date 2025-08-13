@@ -4,14 +4,20 @@ import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
 import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
+import com.example.campuspulseai.southBound.entity.Event;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Tag(name = "Event endpoints", description = "Endpoints for event operations")
@@ -46,11 +52,14 @@ public class EventController {
         return eventService.getAllEvents();
     }
 
-    @Operation(summary = "Get event by ID", description = "Retrieves an event by its ID.")
-    @GetMapping("/{id}")
+    @Operation(summary = "Get event details", description = "Retrieves detailed info for a specific event by its ID.")
+    @GetMapping("/details/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CreateEventResponse getEventById(@PathVariable Long id) {
-        return eventService.getEventById(id);
+    public ResponseEntity<GetEventResponse> getEventDetails(@PathVariable Long id) {
+        GetEventResponse eventDetails = eventService.getEventDetails(id);
+        return eventDetails != null ?
+            ResponseEntity.ok(eventDetails) :
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @Operation(summary = "Delete event by ID", description = "Deletes an event by its ID.")
@@ -109,6 +118,21 @@ public class EventController {
         // Logic to get attendees of an event by event ID
         return eventService.getAttendeesByEventId(eventId);
     }
+
+    @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
+    @GetMapping("/upcoming")
+    public ResponseEntity<Map<String, Object>> getEvents(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dateTime,
+            @RequestParam(required = false) String label) {
+        List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, label);
+        Map<String, Object> response = new HashMap<>();
+        response.put("upcomingEvents", upcomingEvents);
+        response.put("message", upcomingEvents.isEmpty() ? "No upcoming events found" : "Upcoming events found");
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }
 
 
