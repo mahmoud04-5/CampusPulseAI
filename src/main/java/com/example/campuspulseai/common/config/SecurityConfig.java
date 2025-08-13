@@ -64,19 +64,6 @@ public class SecurityConfig {
         };
     }
 
-//    //this bean is used to manage user details in the database and to define the queries for the custom tables in the db
-//    @Bean
-//    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-//        jdbcUserDetailsManager
-//                .setUsersByUsernameQuery("select id, password, active from system_users where user_id=? ");
-//
-//        jdbcUserDetailsManager
-//                .setAuthoritiesByUsernameQuery("select id, role from roles where user_id=?");
-//
-//        return jdbcUserDetailsManager;
-//    }
-
     //this bean is used to configure the security filter chain to apply the security rules for each endpoint and general security rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -103,7 +90,6 @@ public class SecurityConfig {
         http.exceptionHandling(exceptionHanling ->
                 exceptionHanling
                         .authenticationEntryPoint(authenticationEntryPoint()));
-
 
         return http.build();
     }
