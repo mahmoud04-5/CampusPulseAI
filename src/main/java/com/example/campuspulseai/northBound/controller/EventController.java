@@ -42,6 +42,7 @@ public class EventController {
         return eventService.updateEvent(createEventRequest);
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Get all events",
             description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
     @GetMapping()

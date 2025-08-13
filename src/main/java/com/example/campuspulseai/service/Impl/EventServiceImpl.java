@@ -16,10 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +36,7 @@ public class EventServiceImpl implements IEventService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
         event.setClub(club);
         Event createdEvent = eventRepository.save(event);
-        return eventMapper.mapToCreateEventResponse(event);
+        return eventMapper.mapToCreateEventResponse(createdEvent);
     }
 
     @Override
@@ -93,22 +91,23 @@ public class EventServiceImpl implements IEventService {
 
     @Override
     public List<GetEventResponse> getUpcomingEvents(ZonedDateTime dateTime, String label) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki")); // 06:34 PM EEST, August 12, 2025
-        ZonedDateTime filterDate = (dateTime != null) ? dateTime : now;
+//        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki")); // 06:34 PM EEST, August 12, 2025
+//        ZonedDateTime filterDate = (dateTime != null) ? dateTime : now;
+//
+//        List<Event> events;
+//        if (label != null && !label.isEmpty()) {
+//            events = eventRepository.findByTimeDateAfterAndLabel(dateTime, label);
+//        } else {
+//            events = eventRepository.findByTimeDateAfter(filterDate);
+//        }
 
-        List<Event> events;
-        if (label != null && !label.isEmpty()) {
-            events = eventRepository.findByTimeDateAfterAndLabel(dateTime, label);
-        } else {
-            events = eventRepository.findByTimeDateAfter(filterDate);
-        }
-
-        return events.stream()
-                .filter(e -> e.getTimeDate().isAfter(filterDate))
-                .map(e -> new GetEventResponse(
-                        e.getId(), e.getTitle(), e.getClub(), e.getDescription(), e.getTimeDate(), e.getLabel()
-                ))
-                .collect(Collectors.toList());
+        return null;
+//                events.stream()
+//                .filter(e -> e.getTimeDate().isAfter(filterDate))
+//                .map(e -> new GetEventResponse(
+//                        e.getId(), e.getTitle(), e.getClub(), e.getDescription(), e.getTimeDate(), e.getLabel()
+//                ))
+        //               .collect(Collectors.toList());
     }
 
     @Override
@@ -116,7 +115,7 @@ public class EventServiceImpl implements IEventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
         return new GetEventResponse(
-                event.getId(), event.getTitle(), event.getClub(), event.getDescription(), event.getTimeDate(), event.getLabel()
+                event.getId(), event.getTitle(), event.getClub(), event.getDescription(), null, null
         );
 
     }

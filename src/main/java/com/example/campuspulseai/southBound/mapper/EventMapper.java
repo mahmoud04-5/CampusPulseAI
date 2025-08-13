@@ -13,7 +13,7 @@ public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "startDate", expression = "java(java.sql.Timestamp.valueOf(request.getStartTime()))")
