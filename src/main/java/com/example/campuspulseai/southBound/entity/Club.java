@@ -29,11 +29,14 @@ public class Club {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    private String clubCategory;
+
+
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
     @Column(nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @CreationTimestamp
     @Column(nullable = false)

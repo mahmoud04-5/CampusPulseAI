@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
-
 @RequestMapping("/api/clubs")
 public class ClubController {
 

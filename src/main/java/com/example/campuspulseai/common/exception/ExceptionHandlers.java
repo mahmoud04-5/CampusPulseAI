@@ -9,6 +9,11 @@ import org.springframework.web.server.ResponseStatusException;
 @ControllerAdvice
 public class ExceptionHandlers {
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException exc) {
+        return buildResponseEntity(exc, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exc) {
         return buildResponseEntity(exc, HttpStatus.valueOf(exc.getStatusCode().value()));
