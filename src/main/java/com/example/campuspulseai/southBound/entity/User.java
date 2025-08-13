@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -46,6 +47,14 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SurveyUserAnswers> userAnswers;
+
+
+    @Column(nullable = false)
+    private boolean surveyCompleted = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return group.getRoles().stream()
@@ -56,6 +65,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public List<SurveyUserAnswers> getSurveyUserAnswers() {
+        return userAnswers;
     }
 }
 

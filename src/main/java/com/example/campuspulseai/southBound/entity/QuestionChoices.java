@@ -33,4 +33,9 @@ public class QuestionChoices {
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
+
+    public String getCategory() {
+        return question != null ? question.getCategory() : null;
+    }
+
 }

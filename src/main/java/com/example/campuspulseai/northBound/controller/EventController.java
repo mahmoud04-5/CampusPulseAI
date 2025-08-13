@@ -36,6 +36,16 @@ public class EventController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Get all events",
+            description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public List<GetEventResponse> getAllEvents() {
+        // Logic to get all events
+        //TODO: Implement pagination!, add option to filter by date, location, etc.
+        return eventService.getAllEvents();
+    }
+
     @Operation(summary = "Get event by ID", description = "Retrieves an event by its ID.")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -51,18 +61,9 @@ public class EventController {
         eventService.deleteEventById(id);
     }
 
-    @Operation(summary = "Get all events",
-            description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
-    @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getAllEvents() {
-        // Logic to get all events
-        //TODO: Implement pagination!, add option to filter by date, location, etc.
-        return eventService.getAllEvents();
-    }
 
     @Operation(summary = "Suggests events to attend", description = "Searches for events based on user preferences.")
-    @GetMapping("/suggest-Attend")
+    @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> suggestEventsToAttend() {
         // Logic to suggest events based on interests
@@ -70,7 +71,7 @@ public class EventController {
     }
 
     @Operation(summary = "Suggest events to create", description = "Suggests events that the Organizer might want to create based on students interests.")
-    @GetMapping("/suggest-Create")
+    @GetMapping("/create-suggestions")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> suggestEventsToCreate() {
         // Logic to suggest events based on user interests
@@ -79,7 +80,7 @@ public class EventController {
 
 
     @Operation(summary = "Get events the user is attending", description = "Retrieves a list of events that the currently authenticated user is attending.")
-    @GetMapping("/attending")
+    @GetMapping("/my-events")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> getEventsAttending() {
         // Logic to get events the user is attending
@@ -87,7 +88,7 @@ public class EventController {
     }
 
     @Operation(summary = " Attend an event", description = "Allows the currently authenticated user to RSVP for an event by its ID.")
-    @PostMapping("/rsvp/{eventId}")
+    @PostMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.OK)
     public void attendEvent(@PathVariable Long eventId) {
         // Logic to mark the user as attending the event
@@ -95,14 +96,14 @@ public class EventController {
     }
 
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
-    @DeleteMapping("/rsvp/{eventId}")
+    @DeleteMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unattendEvent(@PathVariable Long eventId) {
         eventService.unattendEvent(eventId);
     }
 
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")
-    @GetMapping("/attendees/{eventId}")
+    @GetMapping("/{eventId}/attendees")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> getAttendeesByEventId(@PathVariable Long eventId) {
         // Logic to get attendees of an event by event ID
