@@ -24,13 +24,13 @@ public class SecurityConfig {
 
     public static final String AUTH_BASE = "/api/auth/**";
     public static final String AUTH_ROOT = "/api/auth/";
-    public static final String DOCS_ROOT = "/docs/";
+    public static final String DOCS_ROOT = "docs/**";
     public static final String DOCS_SINGLE = "/docs";
-    public static final String SWAGGER_UI = "/swagger-ui/";
+    public static final String SWAGGER_UI = "/swagger-ui/**";
     public static final String SWAGGER_HTML = "/swagger-ui.html";
-    public static final String API_DOCS = "/v3/api-docs/";
+    public static final String API_DOCS = "/v3/api-docs/**";
     public static final String WEBJARS = "/webjars/";
-    public static final String SWAGGER_RESOURCES = "/swagger-recources/";
+    public static final String SWAGGER_RESOURCES = "/swagger-recources/**";
 
     private final IUserRepository userRepository;
 
