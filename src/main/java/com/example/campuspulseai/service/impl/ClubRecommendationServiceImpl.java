@@ -44,7 +44,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
                 .toList();
 
 
-        List<Club> recommendedClubs = clubRepository.findByClubCategoryIn(preferredCategories);
+        List<Club> recommendedClubs = null;//clubRepository.findByClubCategoryIn(preferredCategories);
         return recommendedClubs.stream()
                 .limit(5)
                 .collect(Collectors.toList());

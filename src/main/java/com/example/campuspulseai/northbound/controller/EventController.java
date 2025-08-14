@@ -6,6 +6,7 @@ import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,11 @@ public class EventController {
 
     private final IEventService eventService;
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Create a new event", description = "Creates a new event with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
+    public CreateEventResponse createEvent(@Valid @RequestBody CreateEventRequest createEventRequest) throws Exception {
         return eventService.createEvent(createEventRequest);
     }
 
@@ -134,7 +136,7 @@ public class EventController {
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")
     public ResponseEntity<Map<String, Object>> getEvents(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dateTime,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
             @RequestParam(required = false) String category) {
         List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, category);
         Map<String, Object> response = new HashMap<>();

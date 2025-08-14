@@ -1,36 +1,45 @@
 package com.example.campuspulseai.service.impl;
 
+import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
-import com.example.campuspulseai.southbound.entity.Event;
-import com.example.campuspulseai.southbound.entity.User;
-import com.example.campuspulseai.southbound.entity.UserEvent;
-import com.example.campuspulseai.southbound.entity.UserEventId;
+import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventMapper;
+import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EventServiceImpl implements IEventService {
 
+    private final IAuthUtils authUtils;
     private final IEventRepository eventRepository;
     private final IUserRepository userRepository;
     private final IUserEventRepository userEventRepository;
+    private final EventMapper eventMapper;
+    private final IClubRepository clubRepository;
 
     @Override
-    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
-        return null;
+    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
+        User user = authUtils.getAuthenticatedUser();
+        Event event = eventMapper.mapToClub(createEventRequest);
+        Club club = getCluByOwnerId(user.getId());
+        event.setClub(club);
+        Event createdEvent = eventRepository.save(event);
+        return eventMapper.mapToCreateEventResponse(createdEvent);
     }
 
     @Override
@@ -81,7 +90,7 @@ public class EventServiceImpl implements IEventService {
                             event.getStartDate()
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -97,7 +106,7 @@ public class EventServiceImpl implements IEventService {
         //userEvent.setUser(currentUser);
         userEvent.setUser(dummyUser);
         userEvent.setEvent(event);
-        userEvent.setRsvpDateTime(ZonedDateTime.now(ZoneId.of("Europe/Helsinki")));
+        userEvent.setRsvpDateTime(LocalDateTime.now());
 
         userEventRepository.save(userEvent);
     }
@@ -117,22 +126,17 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> getUpcomingEvents(ZonedDateTime startDate, String category) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki")); // 06:34 PM EEST, August 12, 2025
-        ZonedDateTime filterDate = (startDate != null) ? startDate : now;
+    public List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category) {
+        LocalDateTime now = LocalDateTime.now(); // 06:34 PM EEST, August 12, 2025
+        LocalDateTime filterDate = (startDate != null) ? startDate : now;
 
-        List<Event> events;
-        if (category != null && !category.isEmpty()) {
-            events = eventRepository.findByTimeDateAfterAndCategory(startDate, category);
-        } else {
-            events = eventRepository.findByTimeDateAfterAndCategory(filterDate, category);
-        }
+        List<Event> events = (category != null && !category.isEmpty()) ?
+                eventRepository.findByTimeDateAfterAndCategory(startDate, category) :
+                eventRepository.findByTimeDateAfterAndCategory(filterDate, category);
 
         return events.stream()
                 .filter(e -> e.getStartDate().isAfter(filterDate) && e.getStartDate() != null)
-                .map(e -> new GetEventResponse(
-                        e.getId(), e.getTitle(), e.getClub(), e.getDescription(), e.getStartDate()
-                ))
+                .map(eventMapper::mapToEventResponseDetails)
                 .collect(Collectors.toList());
     }
 
@@ -140,12 +144,9 @@ public class EventServiceImpl implements IEventService {
     public GetEventResponse getEventDetails(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
-        return new GetEventResponse(
-                event.getId(), event.getTitle(), event.getClub(), event.getDescription(), event.getStartDate()
-        );
+        return eventMapper.mapToEventResponseDetails(event);
 
     }
-
 
     @Override
     public User getCurrentUser() {
@@ -164,4 +165,10 @@ public class EventServiceImpl implements IEventService {
         return userRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Dummy user not found"));
     }
+
+    private Club getCluByOwnerId(Long ownerId) {
+        return clubRepository.findByOwnerId(ownerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
+    }
+
 }

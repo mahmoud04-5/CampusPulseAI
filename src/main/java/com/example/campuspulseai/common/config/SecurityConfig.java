@@ -1,25 +1,29 @@
 package com.example.campuspulseai.common.config;
 
 import com.example.campuspulseai.southbound.repository.IUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
+@EnableMethodSecurity
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
     public static final String AUTH_BASE = "/api/auth/**";
-    public static final String AUTH_ROOT = "/api/auth/";
+    public static final String AUTH_ROOT = "/api/auth";
     public static final String DOCS_ROOT = "docs/**";
     public static final String DOCS_SINGLE = "/docs";
     public static final String SWAGGER_UI = "/swagger-ui/**";
@@ -29,17 +33,7 @@ public class SecurityConfig {
     public static final String SWAGGER_RESOURCES = "/swagger-resources/**";
 
     private final IUserRepository userRepository;
-
-    public SecurityConfig(IUserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    // Bean to load user details by email using the custom user repository
-    @Bean
-    UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-    }
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // Bean to provide password encoding using BCrypt hashing algorithm
     @Bean
@@ -67,8 +61,7 @@ public class SecurityConfig {
     //this bean is used to configure the security filter chain to apply the security rules for each endpoint and general security rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(configurer ->
+        http.authorizeHttpRequests(configurer ->
                         configurer
                                 .requestMatchers(
                                         AUTH_ROOT,
@@ -82,15 +75,12 @@ public class SecurityConfig {
                                         AUTH_BASE
                                 ).permitAll()
                                 .anyRequest().authenticated()
-                );
+                )
+                .httpBasic(Customizer.withDefaults())
+                .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint()))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.httpBasic(Customizer.withDefaults());
-
-
-        http.exceptionHandling(exceptionHanling ->
-                exceptionHanling
-                        .authenticationEntryPoint(authenticationEntryPoint()));
-
+        http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 

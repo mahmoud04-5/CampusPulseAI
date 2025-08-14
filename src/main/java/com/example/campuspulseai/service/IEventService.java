@@ -5,12 +5,12 @@ import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.User;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IEventService {
 
-    CreateEventResponse createEvent(CreateEventRequest createEventRequest);
+    CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception;
 
     CreateEventResponse updateEvent(CreateEventRequest createEventRequest);
 
@@ -34,7 +34,7 @@ public interface IEventService {
 
     List<GetEventResponse> getAttendeesByEventId(Long eventId);
 
-    List<GetEventResponse> getUpcomingEvents(ZonedDateTime startDate, String category);
+    List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category);
 
     GetEventResponse getEventDetails(Long id);
 
