@@ -1,7 +1,7 @@
 package com.example.campuspulseai.southBound.mapper;
 
-import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.southBound.entity.Event;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,7 +16,7 @@ public interface EventMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "startDate", expression = "java(java.sql.Timestamp.valueOf(request.getStartTime()))")
+    @Mapping(target = "timeDate", source = "request.startTime")
     Event mapToClub(CreateEventRequest request);
 
     @Mapping(target = "eventId", source = "event.id")

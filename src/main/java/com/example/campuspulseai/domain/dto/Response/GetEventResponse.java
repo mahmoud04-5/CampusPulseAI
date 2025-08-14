@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.DTO.Response;
+package com.example.campuspulseai.domain.dto.Response;
 
 import com.example.campuspulseai.southBound.entity.Club;
 import lombok.AllArgsConstructor;
@@ -17,20 +17,31 @@ public class GetEventResponse {
     private String description;
     private String location;
     private Timestamp startTime;
-    private int capacity;
+    private Integer capacity;
     private String imageUrl;
     private String eventCategory;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public GetEventResponse(long id, String title, Club club, String description, ZonedDateTime timeDate, String label) {
-    }
-    public GetEventResponse(long id, String title, String description, ZonedDateTime timeDate, String label) {
+
+    public GetEventResponse(long id, String title, String description, ZonedDateTime timeDate) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.startTime = Timestamp.from(timeDate.toInstant());
-        this.location = label;
+    }
+
+
+    public GetEventResponse(long id, String title, Club club, String description, ZonedDateTime timeDate) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.startTime = Timestamp.from(timeDate.toInstant());
+        if (club != null) {
+            this.location = club.getName();
+            this.imageUrl = club.getLogoUrl();
+            //this.eventCategory = club.getClubCategory();  No such club category
+        }
     }
 
 }

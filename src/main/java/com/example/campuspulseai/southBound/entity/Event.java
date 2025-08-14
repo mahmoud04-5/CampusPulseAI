@@ -8,6 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "event")
 @Entity
@@ -17,9 +20,9 @@ import java.sql.Timestamp;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id; // Changed to Long for consistency with nullable contexts
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) // Changed to LAZY for performance
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
@@ -28,9 +31,6 @@ public class Event {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-
-    @Column(nullable = false)
-    private Timestamp startDate;
 
     @Column(nullable = false, length = 255)
     private String location;
@@ -55,7 +55,25 @@ public class Event {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-//    private ZonedDateTime timeDate;
-//
-//    private String label;
+    @Column(name = "start_date")
+    private ZonedDateTime timeDate; // Renamed for clarity and consistency
+
+    @OneToMany(mappedBy = "event")
+    private List<UserEvent> attendees = new ArrayList<>();
+
+    // Custom getter for isActive to follow JavaBean convention
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public ZonedDateTime getStartDate() {
+        if (timeDate == null) {
+            throw new IllegalStateException("Start date is not set for the event");
+        }
+        return timeDate; // Return the full ZonedDateTime
+    }
 }

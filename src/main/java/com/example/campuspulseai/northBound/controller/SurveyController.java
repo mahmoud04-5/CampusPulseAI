@@ -1,6 +1,6 @@
 package com.example.campuspulseai.northBound.controller;
 
-import com.example.campuspulseai.domain.DTO.SurveyQuestionDTO;
+import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
 import com.example.campuspulseai.service.ISurveyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

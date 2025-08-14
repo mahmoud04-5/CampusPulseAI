@@ -1,9 +1,9 @@
 package com.example.campuspulseai.northBound.controller;
 
 
-import com.example.campuspulseai.domain.DTO.Request.CreateClubRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateClubResponse;
-import com.example.campuspulseai.domain.DTO.Response.GetClubResponse;
+import com.example.campuspulseai.domain.dto.Request.CreateClubRequest;
+import com.example.campuspulseai.domain.dto.Response.CreateClubResponse;
+import com.example.campuspulseai.domain.dto.Response.GetClubResponse;
 import com.example.campuspulseai.service.IClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

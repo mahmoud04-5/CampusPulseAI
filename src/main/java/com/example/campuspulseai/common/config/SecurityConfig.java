@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
@@ -28,7 +30,7 @@ public class SecurityConfig {
     public static final String SWAGGER_HTML = "/swagger-ui.html";
     public static final String API_DOCS = "/v3/api-docs/**";
     public static final String WEBJARS = "/webjars/";
-    public static final String SWAGGER_RESOURCES = "/swagger-recources/**";
+    public static final String SWAGGER_RESOURCES = "/swagger-resources/**";
 
     private final IUserRepository userRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;

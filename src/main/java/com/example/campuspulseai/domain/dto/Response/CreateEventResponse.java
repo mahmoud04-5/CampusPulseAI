@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.DTO.Response;
+package com.example.campuspulseai.domain.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateEventResponse {
     private String title;
-    private long eventId;
+    private Long eventId;
 }

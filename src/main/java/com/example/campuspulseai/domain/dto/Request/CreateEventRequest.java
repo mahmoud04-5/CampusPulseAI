@@ -1,11 +1,11 @@
-package com.example.campuspulseai.domain.DTO.Request;
+package com.example.campuspulseai.domain.dto.Request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Setter
 @Getter
@@ -19,7 +19,7 @@ public class CreateEventRequest {
 
     @Future
     @NotNull
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @Size(min = 1, max = 50, message = "Location must be between 1 and 50 characters")
     private String location;

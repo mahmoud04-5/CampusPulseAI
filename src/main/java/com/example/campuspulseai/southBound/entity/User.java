@@ -35,9 +35,8 @@ public class User implements UserDetails {
 
     private Boolean isActive = true;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "role_group", referencedColumnName = "id", nullable = false)
-    @ToString.Exclude
     private Group group;
 
     @CreationTimestamp

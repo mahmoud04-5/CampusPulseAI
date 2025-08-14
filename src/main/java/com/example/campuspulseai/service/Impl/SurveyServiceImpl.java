@@ -1,9 +1,9 @@
 package com.example.campuspulseai.service.Impl;
 
-import com.example.campuspulseai.domain.DTO.SurveyQuestionDTO;
+import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
 import com.example.campuspulseai.service.ISurveyService;
-import com.example.campuspulseai.southBound.entity.User;
 import com.example.campuspulseai.southBound.entity.SurveyUserAnswers;
+import com.example.campuspulseai.southBound.entity.User;
 import com.example.campuspulseai.southBound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southBound.repository.ISurveyQuestionRepository;
 import com.example.campuspulseai.southBound.repository.ISurveyUserAnswersRepository;
@@ -31,17 +31,16 @@ public class SurveyServiceImpl implements ISurveyService {
     public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
         User user = getAuthenticatedUser();
         surveyResponses.forEach(surveyQuestionDTO -> {
-            if(surveyQuestionDTO.getChoices() == null || surveyQuestionDTO.getChoices().isEmpty()) {
+            if (surveyQuestionDTO.getChoices() == null || surveyQuestionDTO.getChoices().isEmpty()) {
                 throw new IllegalArgumentException("Survey answer cannot be null or empty");
-            }
-            else{
+            } else {
                 surveyQuestionDTO.getSelectedChoicesIds().forEach(choiceId -> {
                     SurveyUserAnswers surveyUserAnswers = new SurveyUserAnswers();
                     surveyUserAnswers.setUser(user); //sets the user field of the SurveyUserAnswers object to the authenticated User retrieved earlier.
-                    surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestionDTO.getQuestionId())
-                            .orElseThrow(() -> new IllegalArgumentException("Survey question not found")));
-                    surveyUserAnswers.setChoice(questionChoicesRepository.findById(choiceId)
-                            .orElseThrow(() -> new IllegalArgumentException("Choice not found")));
+                    //surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestionDTO.getQuestionId())
+                          //  .orElseThrow(() -> new IllegalArgumentException("Survey question not found")));
+                    //surveyUserAnswers.setChoice(questionChoicesRepository.findById(choiceId)
+                            //.orElseThrow(() -> new IllegalArgumentException("Choice not found")));
                     surveyUserAnswersRepository.save(surveyUserAnswers
                     );
                 });

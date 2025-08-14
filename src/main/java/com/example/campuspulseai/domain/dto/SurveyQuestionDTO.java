@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.DTO;
+package com.example.campuspulseai.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class SurveyQuestionDTO {
-    private long questionId;
+    private Long questionId;
     private String questionText;
     private List<String> choices;
     private List<Long> selectedChoicesIds;
