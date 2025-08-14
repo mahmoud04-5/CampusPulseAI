@@ -65,11 +65,11 @@ public class EventController {
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Delete event by ID", description = "Deletes an event by its ID.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEventById(@PathVariable Long id) {
-        // Logic to delete the event by ID
+    public void deleteEventById(@PathVariable Long id) throws Exception {
         eventService.deleteEventById(id);
     }
 

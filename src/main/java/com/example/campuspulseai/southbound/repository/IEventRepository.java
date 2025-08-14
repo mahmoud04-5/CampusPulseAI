@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IEventRepository extends JpaRepository<Event, Long> {
     List<Event> findByTimeDateAfterAndCategory(LocalDateTime startDate, String category);
 
+    Optional<Event> findByIdAndIsActiveTrue(Long id);
 
 }

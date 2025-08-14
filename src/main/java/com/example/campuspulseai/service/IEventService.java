@@ -17,7 +17,7 @@ public interface IEventService {
 
     CreateEventResponse getEventById(Long id);
 
-    void deleteEventById(Long id);
+    void deleteEventById(Long id) throws Exception;
 
     List<GetEventResponse> getAllEventsForCurrentUser();
 

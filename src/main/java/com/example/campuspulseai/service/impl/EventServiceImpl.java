@@ -66,8 +66,14 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public void deleteEventById(Long id) {
-
+    public void deleteEventById(Long id) throws Exception {
+        Event event = getEventFromDBById(id);
+        Club club = clubRepository.getById(event.getClub().getId());
+        User user = authUtils.getAuthenticatedUser();
+        validateUserClubownership(user, club);
+        validateEventTime(event);
+        event.setIsActive(false);
+        eventRepository.save(event);
     }
 
     @Override
@@ -186,7 +192,7 @@ public class EventServiceImpl implements IEventService {
     }
 
     private Event getEventFromDBById(Long id) {
-        return eventRepository.findById(id)
+        return eventRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
     }
 
