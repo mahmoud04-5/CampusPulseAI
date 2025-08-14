@@ -1,8 +1,8 @@
 package com.example.campuspulseai.service;
 
-import com.example.campuspulseai.domain.dto.Request.AuthenticationRequest;
-import com.example.campuspulseai.domain.dto.Request.RegisterRequest;
-import com.example.campuspulseai.domain.dto.Response.LoginResponse;
+import com.example.campuspulseai.domain.dto.request.AuthenticationRequest;
+import com.example.campuspulseai.domain.dto.request.RegisterRequest;
+import com.example.campuspulseai.domain.dto.response.LoginResponse;
 
 public interface IAuthenticationService {
 

@@ -1,6 +1,6 @@
 package com.example.campuspulseai.common.config;
 
-import com.example.campuspulseai.southBound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -67,22 +67,22 @@ public class SecurityConfig {
     //this bean is used to configure the security filter chain to apply the security rules for each endpoint and general security rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.   csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(configurer ->
-                configurer
-                        .requestMatchers(
-                                AUTH_ROOT,
-                                DOCS_ROOT,
-                                SWAGGER_UI,
-                                API_DOCS,
-                                DOCS_SINGLE,
-                                WEBJARS,
-                                SWAGGER_RESOURCES,
-                                SWAGGER_HTML,
-                                AUTH_BASE
-                        ).permitAll()
-                        .anyRequest().authenticated()
-        );
+                        configurer
+                                .requestMatchers(
+                                        AUTH_ROOT,
+                                        DOCS_ROOT,
+                                        SWAGGER_UI,
+                                        API_DOCS,
+                                        DOCS_SINGLE,
+                                        WEBJARS,
+                                        SWAGGER_RESOURCES,
+                                        SWAGGER_HTML,
+                                        AUTH_BASE
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                );
 
         http.httpBasic(Customizer.withDefaults());
 
