@@ -1,8 +1,8 @@
 package com.example.campuspulseai.service.impl;
 
-import com.example.campuspulseai.domain.dto.Request.AuthenticationRequest;
-import com.example.campuspulseai.domain.dto.Request.RegisterRequest;
-import com.example.campuspulseai.domain.dto.Response.LoginResponse;
+import com.example.campuspulseai.domain.dto.request.AuthenticationRequest;
+import com.example.campuspulseai.domain.dto.request.RegisterRequest;
+import com.example.campuspulseai.domain.dto.response.LoginResponse;
 import com.example.campuspulseai.service.IAuthenticationService;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.mapper.AuthMapper;
@@ -13,9 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
 
 
 @RequiredArgsConstructor
@@ -29,7 +26,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final JwtServiceImpl jwtService;
 
     @Override
-    @Transactional
     public void register(RegisterRequest registerRequest) throws Exception {
 
         registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
@@ -38,7 +34,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public LoginResponse login(AuthenticationRequest authenticationRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -49,10 +44,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         User user = (User) authentication.getPrincipal();
 
-        HashMap claims = new HashMap<>();
-        claims.put("authorities", user.getAuthorities());
-
-        String jwtToken = jwtService.generateToken(claims, user);
+        String jwtToken = jwtService.generateToken(user);
 
         return authenticationMapper.mapToLoginResponse(user, jwtToken);
     }

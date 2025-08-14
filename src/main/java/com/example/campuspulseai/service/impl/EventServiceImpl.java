@@ -2,10 +2,10 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
-import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
-import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.request.EditEventRequest;
+import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
 import com.example.campuspulseai.southbound.mapper.EventMapper;

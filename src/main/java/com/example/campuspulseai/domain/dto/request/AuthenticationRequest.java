@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.dto.Request;
+package com.example.campuspulseai.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

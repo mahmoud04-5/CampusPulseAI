@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.dto.Response;
+package com.example.campuspulseai.domain.dto.response;
 
 import com.example.campuspulseai.southbound.entity.Club;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.dto.Request;
+package com.example.campuspulseai.domain.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

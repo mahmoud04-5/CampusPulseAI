@@ -1,9 +1,9 @@
 package com.example.campuspulseai.southbound.mapper;
 
-import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
-import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.request.EditEventRequest;
+import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.Event;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
