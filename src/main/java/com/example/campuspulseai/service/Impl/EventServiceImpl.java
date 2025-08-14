@@ -93,7 +93,7 @@ public class EventServiceImpl implements IEventService {
                             event.getStartDate()
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

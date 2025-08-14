@@ -1,13 +1,13 @@
 package com.example.campuspulseai.southBound.Enum;
 
 public enum Category {
-    Sports("Sports"),
-    Entertainment("Entertainment"),
-    Education("Education"),
-    Technology("Technology"),
-    Health("Health"),
-    Arts("Arts"),
-    Religion("Religion");
+    SPORTS("Sports"),
+    ENTERTAINMENT("Entertainment"),
+    EDUCATION("Education"),
+    TECHNOLOGY("Technology"),
+    HEALTH("Health"),
+    ARTS("Arts"),
+    RELIFION("Religion");
 
     private final String category;
 
