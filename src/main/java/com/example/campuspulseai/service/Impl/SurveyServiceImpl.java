@@ -37,10 +37,10 @@ public class SurveyServiceImpl implements ISurveyService {
                 surveyQuestionDTO.getSelectedChoicesIds().forEach(choiceId -> {
                     SurveyUserAnswers surveyUserAnswers = new SurveyUserAnswers();
                     surveyUserAnswers.setUser(user); //sets the user field of the SurveyUserAnswers object to the authenticated User retrieved earlier.
-                    surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestionDTO.getQuestionId())
-                            .orElseThrow(() -> new IllegalArgumentException("Survey question not found")));
-                    surveyUserAnswers.setChoice(questionChoicesRepository.findById(choiceId)
-                            .orElseThrow(() -> new IllegalArgumentException("Choice not found")));
+                    //surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestionDTO.getQuestionId())
+                          //  .orElseThrow(() -> new IllegalArgumentException("Survey question not found")));
+                    //surveyUserAnswers.setChoice(questionChoicesRepository.findById(choiceId)
+                            //.orElseThrow(() -> new IllegalArgumentException("Choice not found")));
                     surveyUserAnswersRepository.save(surveyUserAnswers
                     );
                 });

@@ -23,15 +23,25 @@ public class GetEventResponse {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public GetEventResponse(long id, String title, Club club, String description, ZonedDateTime timeDate, String label) {
-    }
 
-    public GetEventResponse(long id, String title, String description, ZonedDateTime timeDate, String label) {
+    public GetEventResponse(long id, String title, String description, ZonedDateTime timeDate) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.startTime = Timestamp.from(timeDate.toInstant());
-        this.location = label;
+    }
+
+
+    public GetEventResponse(long id, String title, Club club, String description, ZonedDateTime timeDate) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.startTime = Timestamp.from(timeDate.toInstant());
+        if (club != null) {
+            this.location = club.getName();
+            this.imageUrl = club.getLogoUrl();
+            this.eventCategory = club.getClubCategory();
+        }
     }
 
 }

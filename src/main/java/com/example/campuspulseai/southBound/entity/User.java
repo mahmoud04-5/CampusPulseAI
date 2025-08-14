@@ -1,7 +1,9 @@
 package com.example.campuspulseai.southBound.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,9 +37,8 @@ public class User implements UserDetails {
 
     private Boolean isActive = true;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "role_group", referencedColumnName = "id", nullable = false)
-    @ToString.Exclude
     private Group group;
 
     @CreationTimestamp

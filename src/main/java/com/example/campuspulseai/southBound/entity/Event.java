@@ -8,7 +8,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "event")
 @Entity
@@ -18,9 +21,9 @@ import java.time.ZonedDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id; // Changed to Long for consistency with nullable contexts
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) // Changed to LAZY for performance
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
@@ -30,14 +33,11 @@ public class Event {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private Timestamp startDate;
-
     @Column(nullable = false, length = 255)
     private String location;
 
     @Column(nullable = false)
-    private Integer capacity;
+    private int capacity; // Changed to int since nullable = false
 
     @Column(nullable = false, length = 50)
     private String category;
@@ -56,91 +56,14 @@ public class Event {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-    private ZonedDateTime timeDate;
+    @Column(name = "start_date")
+    private ZonedDateTime timeDate; // Renamed for clarity and consistency
 
-    private String label;
+    @OneToMany(mappedBy = "event")
+    private List<UserEvent> attendees = new ArrayList<>();
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Club getClub() {
-        return club;
-    }
-
-    public void setClub(Club club) {
-        this.club = club;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Timestamp getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Timestamp startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Boolean getActive() {
+    // Custom getter for isActive to follow JavaBean convention
+    public boolean isActive() {
         return isActive;
     }
 
@@ -148,27 +71,10 @@ public class Event {
         isActive = active;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public ZonedDateTime getTimeDate() {
-        return timeDate;
-    }
-
-    public void setTimeDate(ZonedDateTime timeDate) {
-        this.timeDate = timeDate;
+    public ZonedDateTime getStartDate() {
+        if (timeDate == null) {
+            throw new IllegalStateException("Start date is not set for the event");
+        }
+        return timeDate; // Return the full ZonedDateTime
     }
 }

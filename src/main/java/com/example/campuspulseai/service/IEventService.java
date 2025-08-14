@@ -1,8 +1,10 @@
 package com.example.campuspulseai.service;
 
-import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
+import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
+import com.example.campuspulseai.southBound.entity.Event;
+import com.example.campuspulseai.southBound.entity.User;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -17,7 +19,7 @@ public interface IEventService {
 
     void deleteEventById(Long id);
 
-    List<GetEventResponse> getAllEvents();
+    List<GetEventResponse> getAllEventsForCurrentUser();
 
 
     List<GetEventResponse> suggestEventsToAttend();
@@ -33,7 +35,11 @@ public interface IEventService {
 
     List<GetEventResponse> getAttendeesByEventId(Long eventId);
 
-    List<GetEventResponse> getUpcomingEvents(ZonedDateTime dateTime, String label);
+    List<GetEventResponse> getUpcomingEvents(ZonedDateTime startDate, String category);
 
     GetEventResponse getEventDetails(Long id);
+
+    User getCurrentUser();
+
+    User getDummyUser();
 }
