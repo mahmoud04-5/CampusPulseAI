@@ -3,7 +3,7 @@ package com.example.campuspulseai.southbound.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,5 +28,5 @@ public class UserEvent {
     private Event event;
 
     @Column(nullable = false)
-    private ZonedDateTime rsvpDateTime;
+    private LocalDateTime rsvpDateTime;
 }

@@ -2,6 +2,7 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
+import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
@@ -20,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -125,7 +124,7 @@ public class EventServiceImpl implements IEventService {
         //userEvent.setUser(currentUser);
         userEvent.setUser(dummyUser);
         userEvent.setEvent(event);
-        userEvent.setRsvpDateTime(ZonedDateTime.now(ZoneId.of("Europe/Helsinki")));
+        userEvent.setRsvpDateTime(LocalDateTime.now());
 
         userEventRepository.save(userEvent);
     }

@@ -1,5 +1,6 @@
 package com.example.campuspulseai.domain.dto.request;
 
+import com.example.campuspulseai.domain.validation.ValidCategory;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public class CreateEventRequest {
     @Max(2000)
     private Integer capacity;
 
-    @com.example.campuspulseai.domain.validation.ValidCategory
+    @ValidCategory
     @NotNull(message = "Event category is required")
     private String category;
 
