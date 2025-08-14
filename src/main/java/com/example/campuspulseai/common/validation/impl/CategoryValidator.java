@@ -1,4 +1,4 @@
-package com.example.campuspulseai.common.validation.Impl;
+package com.example.campuspulseai.common.validation.impl;
 
 import com.example.campuspulseai.domain.validation.ValidCategory;
 import com.example.campuspulseai.southbound.Enum.Category;

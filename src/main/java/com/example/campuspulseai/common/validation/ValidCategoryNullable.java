@@ -1,6 +1,6 @@
 package com.example.campuspulseai.common.validation;
 
-import com.example.campuspulseai.common.validation.Impl.CategoryNullableValidator;
+import com.example.campuspulseai.common.validation.impl.CategoryNullableValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
