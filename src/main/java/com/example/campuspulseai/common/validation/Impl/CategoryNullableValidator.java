@@ -1,7 +1,7 @@
 package com.example.campuspulseai.common.validation.Impl;
 
 import com.example.campuspulseai.common.validation.ValidCategoryNullable;
-import com.example.campuspulseai.southBound.Enum.Category;
+import com.example.campuspulseai.southbound.Enum.Category;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,9 +1,9 @@
 package com.example.campuspulseai.common.validation.Impl;
 
-import com.example.campuspulseai.southBound.Enum.Category;
+import com.example.campuspulseai.domain.validation.ValidCategory;
+import com.example.campuspulseai.southbound.Enum.Category;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import com.example.campuspulseai.domain.validation.ValidCategory;
 
 public class CategoryValidator implements ConstraintValidator<ValidCategory, String> {
     @Override

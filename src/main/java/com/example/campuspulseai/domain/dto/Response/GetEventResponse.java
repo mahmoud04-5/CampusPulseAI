@@ -1,6 +1,6 @@
 package com.example.campuspulseai.domain.dto.Response;
 
-import com.example.campuspulseai.southBound.entity.Club;
+import com.example.campuspulseai.southbound.entity.Club;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.example.campuspulseai.common.config;
 
-import com.example.campuspulseai.southBound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

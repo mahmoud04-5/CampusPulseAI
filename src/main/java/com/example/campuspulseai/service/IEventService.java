@@ -4,7 +4,7 @@ import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
-import com.example.campuspulseai.southBound.entity.User;
+import com.example.campuspulseai.southbound.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
