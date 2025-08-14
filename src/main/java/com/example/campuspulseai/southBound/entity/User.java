@@ -66,8 +66,5 @@ public class User implements UserDetails {
         return email;
     }
 
-//    public List<SurveyUserAnswers> getSurveyUserAnswers() {
-//        return userAnswers;
-//    }
 }
 

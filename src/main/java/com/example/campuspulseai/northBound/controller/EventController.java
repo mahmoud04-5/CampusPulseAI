@@ -1,17 +1,16 @@
 package com.example.campuspulseai.northBound.controller;
 
-import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
-import com.example.campuspulseai.southBound.entity.Event;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
@@ -58,8 +57,8 @@ public class EventController {
     public ResponseEntity<GetEventResponse> getEventDetails(@PathVariable Long id) {
         GetEventResponse eventDetails = eventService.getEventDetails(id);
         return eventDetails != null ?
-            ResponseEntity.ok(eventDetails) :
-            ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                ResponseEntity.ok(eventDetails) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @Operation(summary = "Delete event by ID", description = "Deletes an event by its ID.")
@@ -130,7 +129,6 @@ public class EventController {
         response.put("message", upcomingEvents.isEmpty() ? "No upcoming events found" : "Upcoming events found");
         return ResponseEntity.ok(response);
     }
-
 
 
 }

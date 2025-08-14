@@ -1,9 +1,8 @@
 package com.example.campuspulseai.service;
 
-import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
-import com.example.campuspulseai.southBound.entity.Event;
+import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 
 import java.time.ZonedDateTime;
 import java.util.List;

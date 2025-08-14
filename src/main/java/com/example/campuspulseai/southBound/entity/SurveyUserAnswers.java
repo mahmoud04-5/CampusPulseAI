@@ -1,9 +1,7 @@
 package com.example.campuspulseai.southBound.entity;
 
-import com.example.campuspulseai.domain.DTO.SurveyQuestionDTO;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +20,7 @@ public class SurveyUserAnswers {
     private SurveyQuestion surveyQuestion;
 
     @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne
@@ -44,8 +42,9 @@ public class SurveyUserAnswers {
     }
 
     public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
-        this.surveyQuestion =surveyQuestion;
+        this.surveyQuestion = surveyQuestion;
     }
+
     public void setChoice(QuestionChoices choice) {
         this.choice = choice;
     }

@@ -1,7 +1,7 @@
 package com.example.campuspulseai.southBound.mapper;
 
-import com.example.campuspulseai.domain.DTO.Request.RegisterRequest;
-import com.example.campuspulseai.domain.DTO.Response.LoginResponse;
+import com.example.campuspulseai.domain.dto.Request.RegisterRequest;
+import com.example.campuspulseai.domain.dto.Response.LoginResponse;
 import com.example.campuspulseai.southBound.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.DTO.Request;
+package com.example.campuspulseai.domain.dto.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ public class CreateEventRequest {
     private String description;
     private String location;
     private Timestamp startTime;
-    private int capacity;
+    private Integer capacity;
     private String imageUrl;
     private String eventCategory;
 }

@@ -1,4 +1,4 @@
-package com.example.campuspulseai.domain.DTO.Response;
+package com.example.campuspulseai.domain.dto.Response;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +10,11 @@ import java.util.List;
 public class GetClubResponse {
 
     // Core Club Information
-    private long clubId;
+    private Long clubId;
     private String name;
     private String description;
     private String logoUrl;
-    private boolean isActive;
+    private Boolean isActive;
     private OrganizerResponse organizerResponse;
     private List<GetEventResponse> events;
 }

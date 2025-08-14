@@ -1,13 +1,12 @@
 package com.example.campuspulseai.service.Impl;
 
-import com.example.campuspulseai.domain.DTO.Request.CreateEventRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateEventResponse;
-import com.example.campuspulseai.domain.DTO.Response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southBound.entity.Event;
 import com.example.campuspulseai.southBound.repository.IEventRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements IEventService {
 
     private final IEventRepository eventRepository;
+
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
         return null;
@@ -82,7 +82,7 @@ public class EventServiceImpl implements IEventService {
 
         List<Event> events;
         if (label != null && !label.isEmpty()) {
-            events = eventRepository.findByTimeDateAfterAndLabel(dateTime,label);
+            events = eventRepository.findByTimeDateAfterAndLabel(dateTime, label);
         } else {
             events = eventRepository.findByTimeDateAfter(filterDate);
         }
@@ -92,7 +92,8 @@ public class EventServiceImpl implements IEventService {
                 .map(e -> new GetEventResponse(
                         e.getId(), e.getTitle(), e.getClub(), e.getDescription(), e.getTimeDate(), e.getLabel()
                 ))
-                .collect(Collectors.toList());    }
+                .collect(Collectors.toList());
+    }
 
     @Override
     public GetEventResponse getEventDetails(Long id) {
