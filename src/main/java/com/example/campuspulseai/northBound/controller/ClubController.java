@@ -1,4 +1,4 @@
-package com.example.campuspulseai.northBound.controller;
+package com.example.campuspulseai.northbound.controller;
 
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
