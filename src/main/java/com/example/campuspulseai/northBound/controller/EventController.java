@@ -1,6 +1,7 @@
 package com.example.campuspulseai.northBound.controller;
 
 import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
@@ -35,11 +36,12 @@ public class EventController {
         return eventService.createEvent(createEventRequest);
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Update an existing event", description = "Updates an existing event with the provided details.")
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CreateEventResponse updateEvent(CreateEventRequest createEventRequest) {
-        return eventService.updateEvent(createEventRequest);
+    public CreateEventResponse updateEvent(@PathVariable Long id, @Valid @RequestBody EditEventRequest editEventRequest) throws Exception {
+        return eventService.updateEvent(id, editEventRequest);
     }
 
     @PreAuthorize("hasRole('STUDENT')")

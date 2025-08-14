@@ -19,8 +19,7 @@ public interface AuthMapper {
     @Mapping(target = "isActive", constant = "true")
     User mapToUser(RegisterRequest registerRequest);
 
-    @Mapping(target = "token", source = "token")
-    @Mapping(target = "email", source = "user.email")
+
     @Mapping(target = "type", constant = "Bearer")
     LoginResponse mapToLoginResponse(User user, String token);
 }

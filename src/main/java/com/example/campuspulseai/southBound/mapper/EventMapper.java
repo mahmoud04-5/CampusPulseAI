@@ -1,11 +1,11 @@
 package com.example.campuspulseai.southBound.mapper;
 
 import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.southBound.entity.Event;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
@@ -25,4 +25,9 @@ public interface EventMapper {
 
     @Mapping(target = "startTime", source = "event.timeDate")
     GetEventResponse mapToEventResponseDetails(Event event);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "timeDate", source = "startTime")
+        // map only if not null
+    void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 }

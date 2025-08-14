@@ -1,7 +1,9 @@
 package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.common.Util.IAuthUtils;
+import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,8 +49,20 @@ public class EventServiceImpl implements IEventService {
 
 
     @Override
-    public CreateEventResponse updateEvent(CreateEventRequest createEventRequest) {
-        return null;
+    public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) throws Exception {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+        Club club = clubRepository.getById(event.getClub().getId());
+        User user = authUtils.getAuthenticatedUser();
+        if (!Objects.equals(user.getId(), club.getOwner().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to update this event");
+        }
+        if (event.getTimeDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot edit an event that has already started");
+        }
+        eventMapper.mapToEventForEdit(editEventRequest, event);
+        Event updatedEvent = eventRepository.save(event);
+        return eventMapper.mapToCreateEventResponse(updatedEvent);
     }
 
     @Override

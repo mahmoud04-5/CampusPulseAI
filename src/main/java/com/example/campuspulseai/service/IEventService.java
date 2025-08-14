@@ -1,6 +1,7 @@
 package com.example.campuspulseai.service;
 
 import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.Request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.southBound.entity.User;
@@ -12,7 +13,7 @@ public interface IEventService {
 
     CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception;
 
-    CreateEventResponse updateEvent(CreateEventRequest createEventRequest);
+    CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) throws Exception;
 
     CreateEventResponse getEventById(Long id);
 
