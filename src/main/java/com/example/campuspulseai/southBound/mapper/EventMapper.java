@@ -2,6 +2,7 @@ package com.example.campuspulseai.southBound.mapper;
 
 import com.example.campuspulseai.domain.dto.Request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.Response.CreateEventResponse;
+import com.example.campuspulseai.domain.dto.Response.GetEventResponse;
 import com.example.campuspulseai.southBound.entity.Event;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,4 +22,7 @@ public interface EventMapper {
 
     @Mapping(target = "eventId", source = "event.id")
     CreateEventResponse mapToCreateEventResponse(Event event);
+
+    @Mapping(target = "startTime", source = "event.timeDate")
+    GetEventResponse mapToEventResponseDetails(Event event);
 }

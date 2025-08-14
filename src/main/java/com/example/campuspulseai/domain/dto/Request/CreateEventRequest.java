@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -19,7 +19,7 @@ public class CreateEventRequest {
 
     @Future
     @NotNull
-    private ZonedDateTime startTime;
+    private LocalDateTime startTime;
 
     @Size(min = 1, max = 50, message = "Location must be between 1 and 50 characters")
     private String location;

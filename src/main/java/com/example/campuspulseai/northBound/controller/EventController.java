@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,8 +102,8 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> attendEvent(@PathVariable Long eventId) {
 
-            eventService.attendEvent(eventId);
-            return new ResponseEntity<>(HttpStatus.OK);
+        eventService.attendEvent(eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
 
 
     }
@@ -136,7 +136,7 @@ public class EventController {
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")
     public ResponseEntity<Map<String, Object>> getEvents(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dateTime,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
             @RequestParam(required = false) String category) {
         List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, category);
         Map<String, Object> response = new HashMap<>();

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -128,22 +129,17 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> getUpcomingEvents(ZonedDateTime startDate, String category) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki")); // 06:34 PM EEST, August 12, 2025
-        ZonedDateTime filterDate = (startDate != null) ? startDate : now;
+    public List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category) {
+        LocalDateTime now = LocalDateTime.now(); // 06:34 PM EEST, August 12, 2025
+        LocalDateTime filterDate = (startDate != null) ? startDate : now;
 
-        List<Event> events;
-        if (category != null && !category.isEmpty()) {
-            events = eventRepository.findByTimeDateAfterAndCategory(startDate, category);
-        } else {
-            events = eventRepository.findByTimeDateAfterAndCategory(filterDate, category);
-        }
+        List<Event> events = (category != null && !category.isEmpty()) ?
+                eventRepository.findByTimeDateAfterAndCategory(startDate, category) :
+                eventRepository.findByTimeDateAfterAndCategory(filterDate, category);
 
         return events.stream()
                 .filter(e -> e.getStartDate().isAfter(filterDate) && e.getStartDate() != null)
-                .map(e -> new GetEventResponse(
-                        e.getId(), e.getTitle(), e.getClub(), e.getDescription(), e.getStartDate()
-                ))
+                .map(eventMapper::mapToEventResponseDetails)
                 .collect(Collectors.toList());
     }
 
@@ -151,9 +147,7 @@ public class EventServiceImpl implements IEventService {
     public GetEventResponse getEventDetails(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
-        return new GetEventResponse(
-                event.getId(), event.getTitle(), event.getClub(), event.getDescription(), event.getStartDate()
-        );
+        return eventMapper.mapToEventResponseDetails(event);
 
     }
 

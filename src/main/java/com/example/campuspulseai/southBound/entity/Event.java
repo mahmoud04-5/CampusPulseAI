@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class Event {
     private Timestamp updatedAt;
 
     @Column(name = "start_date")
-    private ZonedDateTime timeDate; // Renamed for clarity and consistency
+    private LocalDateTime timeDate; // Renamed for clarity and consistency
 
     @OneToMany(mappedBy = "event")
     private List<UserEvent> attendees = new ArrayList<>();
@@ -70,7 +70,7 @@ public class Event {
         isActive = active;
     }
 
-    public ZonedDateTime getStartDate() {
+    public LocalDateTime getStartDate() {
         if (timeDate == null) {
             throw new IllegalStateException("Start date is not set for the event");
         }
