@@ -50,7 +50,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         User user = (User) authentication.getPrincipal();
 
         HashMap claims = new HashMap<>();
-        claims.put("authorities", user.getAuthorities());
 
         String jwtToken = jwtService.generateToken(claims, user);
 

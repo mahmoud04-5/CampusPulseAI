@@ -18,9 +18,7 @@ public interface AuthMapper {
     @Mapping(target = "group", expression = "java(new com.example.campuspulseai.southBound.entity.Group(1L, \"GROUP_STUDENTS\", null))")
     @Mapping(target = "isActive", constant = "true")
     User mapToUser(RegisterRequest registerRequest);
-
-    @Mapping(target = "token", source = "token")
-    @Mapping(target = "email", source = "user.email")
+    
     @Mapping(target = "type", constant = "Bearer")
     LoginResponse mapToLoginResponse(User user, String token);
 }

@@ -67,6 +67,7 @@ public class JwtServiceImpl implements IJwtService {
 
     @Override
     public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
+        claims.put("authorities", userDetails.getAuthorities());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
