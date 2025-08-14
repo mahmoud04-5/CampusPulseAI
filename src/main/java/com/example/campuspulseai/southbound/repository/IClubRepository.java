@@ -1,6 +1,6 @@
-package com.example.campuspulseai.southBound.repository;
+package com.example.campuspulseai.southbound.repository;
 
-import com.example.campuspulseai.southBound.entity.Club;
+import com.example.campuspulseai.southbound.entity.Club;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

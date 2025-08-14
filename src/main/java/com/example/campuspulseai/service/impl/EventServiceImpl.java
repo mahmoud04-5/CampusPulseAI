@@ -1,17 +1,18 @@
 package com.example.campuspulseai.service.impl;
 
+import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
-import com.example.campuspulseai.southbound.entity.Event;
-import com.example.campuspulseai.southbound.entity.User;
-import com.example.campuspulseai.southbound.entity.UserEvent;
-import com.example.campuspulseai.southbound.entity.UserEventId;
+import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventMapper;
+import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -105,7 +106,7 @@ public class EventServiceImpl implements IEventService {
         //userEvent.setUser(currentUser);
         userEvent.setUser(dummyUser);
         userEvent.setEvent(event);
-        userEvent.setRsvpDateTime(ZonedDateTime.now(ZoneId.of("Europe/Helsinki")));
+        userEvent.setRsvpDateTime(LocalDateTime.now());
 
         userEventRepository.save(userEvent);
     }

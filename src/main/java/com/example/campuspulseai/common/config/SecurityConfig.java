@@ -1,6 +1,6 @@
 package com.example.campuspulseai.common.config;
 
-import com.example.campuspulseai.southBound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,13 +34,6 @@ public class SecurityConfig {
 
     private final IUserRepository userRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-//    // Bean to load user details by email using the custom user repository
-//    @Bean
-//    UserDetailsService userDetailsService() {
-//        return email -> userRepository.findByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-//    }
 
     // Bean to provide password encoding using BCrypt hashing algorithm
     @Bean

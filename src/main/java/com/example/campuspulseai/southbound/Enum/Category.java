@@ -1,4 +1,4 @@
-package com.example.campuspulseai.southBound.Enum;
+package com.example.campuspulseai.southbound.Enum;
 
 public enum Category {
     SPORTS("Sports"),
