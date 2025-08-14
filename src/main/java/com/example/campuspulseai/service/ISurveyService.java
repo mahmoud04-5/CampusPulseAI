@@ -1,7 +1,7 @@
 package com.example.campuspulseai.service;
 
-import com.example.campuspulseai.domain.DTO.SurveyQuestionDTO;
-import com.example.campuspulseai.southBound.entity.User;
+import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
+import com.example.campuspulseai.southbound.entity.User;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public interface ISurveyService {
 
     void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses);
 
-    public boolean isSurveyCompleted();
+    boolean isSurveyCompleted();
 
-    public User getAuthenticatedUser();
+    User getAuthenticatedUser();
 }

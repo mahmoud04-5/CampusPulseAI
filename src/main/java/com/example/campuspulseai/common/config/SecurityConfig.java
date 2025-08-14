@@ -1,6 +1,6 @@
 package com.example.campuspulseai.common.config;
 
-import com.example.campuspulseai.southBound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -11,12 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.sql.DataSource;
 
 
 @Configuration
@@ -68,38 +64,25 @@ public class SecurityConfig {
         };
     }
 
-    //this bean is used to manage user details in the database and to define the queries for the custom tables in the db
-    @Bean
-    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        jdbcUserDetailsManager
-                .setUsersByUsernameQuery("select id, password, active from system_users where user_id=? ");
-
-        jdbcUserDetailsManager
-                .setAuthoritiesByUsernameQuery("select id, role from roles where user_id=?");
-
-        return jdbcUserDetailsManager;
-    }
-
     //this bean is used to configure the security filter chain to apply the security rules for each endpoint and general security rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.   csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(configurer ->
-                configurer
-                        .requestMatchers(
-                                AUTH_ROOT,
-                                DOCS_ROOT,
-                                SWAGGER_UI,
-                                API_DOCS,
-                                DOCS_SINGLE,
-                                WEBJARS,
-                                SWAGGER_RESOURCES,
-                                SWAGGER_HTML,
-                                AUTH_BASE
-                        ).permitAll()
-                        .anyRequest().permitAll()
-        );
+                        configurer
+                                .requestMatchers(
+                                        AUTH_ROOT,
+                                        DOCS_ROOT,
+                                        SWAGGER_UI,
+                                        API_DOCS,
+                                        DOCS_SINGLE,
+                                        WEBJARS,
+                                        SWAGGER_RESOURCES,
+                                        SWAGGER_HTML,
+                                        AUTH_BASE
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                );
 
         http.httpBasic(Customizer.withDefaults());
 
@@ -107,7 +90,6 @@ public class SecurityConfig {
         http.exceptionHandling(exceptionHanling ->
                 exceptionHanling
                         .authenticationEntryPoint(authenticationEntryPoint()));
-
 
         return http.build();
     }

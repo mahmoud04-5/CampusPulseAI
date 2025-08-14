@@ -48,7 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-
     private String extractJwtFromRequest(HttpServletRequest request) {
         final String authHeader = request.getHeader(AUTH_HEADER);
         if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
@@ -73,4 +72,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
-}}
+    }
+}
+//this is a dummy comment to change package name

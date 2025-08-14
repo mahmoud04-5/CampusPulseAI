@@ -1,8 +1,8 @@
 package com.example.campuspulseai.service;
 
-import com.example.campuspulseai.domain.DTO.Request.CreateClubRequest;
-import com.example.campuspulseai.domain.DTO.Response.CreateClubResponse;
-import com.example.campuspulseai.domain.DTO.Response.GetClubResponse;
+import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
+import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
+import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import org.springframework.data.domain.Page;
 
 

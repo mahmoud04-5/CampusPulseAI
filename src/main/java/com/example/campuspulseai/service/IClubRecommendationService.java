@@ -1,11 +1,11 @@
 package com.example.campuspulseai.service;
 
 
-import com.example.campuspulseai.southBound.entity.Club;
+import com.example.campuspulseai.southbound.entity.Club;
 
 import java.util.List;
 
 public interface IClubRecommendationService {
-    public List<Club> getRecommendationsForUser(Long userId);
+    List<Club> getRecommendationsForUser(Long userId);
 
 }
