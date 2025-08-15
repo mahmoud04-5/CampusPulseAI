@@ -2,7 +2,6 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
-import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
@@ -14,7 +13,11 @@ import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.specification.IEventSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class EventServiceImpl implements IEventService {
     private final IUserEventRepository userEventRepository;
     private final EventMapper eventMapper;
     private final IClubRepository clubRepository;
+    private final IEventSpecifications eventSpecifications;
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
@@ -91,6 +95,18 @@ public class EventServiceImpl implements IEventService {
     public List<GetEventResponse> getEventsAttending() {
         User currentUser = getCurrentUser();
         return List.of();
+    }
+
+    @Override
+    public List<GetEventResponse> getAllEventsWithFilters(Long clubId, LocalDateTime eventDateTime, Integer page, Integer size) {
+        Specification<Event> spec = eventSpecifications.isActive()
+                .and(eventSpecifications.hasClubId(clubId))
+                .and(eventSpecifications.hasEventDate(eventDateTime));
+
+        Pageable pageable = PageRequest.of(page, size);
+        return eventRepository.findAll(spec, pageable).stream()
+                .map(eventMapper::mapToEventResponseDetails)
+                .toList();
     }
 
     @Override

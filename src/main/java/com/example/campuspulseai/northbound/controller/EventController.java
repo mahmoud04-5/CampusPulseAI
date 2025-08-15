@@ -49,10 +49,13 @@ public class EventController {
             description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getAllEvents() {
-        // Logic to get all events
-        //TODO: Implement pagination!, add option to filter by date, location, etc.
-        return eventService.getAllEventsForCurrentUser();
+    public List<GetEventResponse> getAllEvents(
+            @RequestParam(required = false) Long clubId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventDateTime,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size
+    ) {
+        return eventService.getAllEventsWithFilters(clubId, eventDateTime, page, size);
     }
 
     @Operation(summary = "Get event details", description = "Retrieves detailed info for a specific event by its ID.")

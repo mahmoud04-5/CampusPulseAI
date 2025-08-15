@@ -21,6 +21,7 @@ public interface IEventService {
 
     List<GetEventResponse> getAllEventsForCurrentUser();
 
+    List<GetEventResponse> getAllEventsWithFilters(Long clubId, LocalDateTime eventDateTime, Integer page, Integer size);
 
     List<GetEventResponse> suggestEventsToAttend();
 
