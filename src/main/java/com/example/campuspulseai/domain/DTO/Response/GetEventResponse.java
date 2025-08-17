@@ -38,7 +38,6 @@ public class GetEventResponse {
         this.description = description;
         this.startTime = Timestamp.from(timeDate.toInstant());
         if (club != null) {
-            this.location = club.getName();
             this.imageUrl = club.getLogoUrl();
             this.eventCategory = club.getClubCategory();
         }

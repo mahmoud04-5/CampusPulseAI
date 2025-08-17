@@ -4,14 +4,20 @@ package com.example.campuspulseai.northBound.controller;
 import com.example.campuspulseai.domain.DTO.Request.CreateClubRequest;
 import com.example.campuspulseai.domain.DTO.Response.CreateClubResponse;
 import com.example.campuspulseai.domain.DTO.Response.GetClubResponse;
+import com.example.campuspulseai.service.IClubRecommendationService;
 import com.example.campuspulseai.service.IClubService;
+import com.example.campuspulseai.southBound.entity.Club;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,6 +27,7 @@ public class ClubController {
 
 
     private final IClubService clubService;
+    private final IClubRecommendationService clubRecommendationService;
 
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
@@ -54,6 +61,13 @@ public class ClubController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return clubService.getClubs(query, page, size);
+    }
+
+    @Operation(summary = "Get Club Recommendations", description = "Retrieves personalized club recommendations for a user based on their survey responses.")
+    @GetMapping("/recommendations/{userId}")
+    public ResponseEntity<List<Club>> getRecommendationsForUser(@PathVariable Long userId) {
+        List<Club> recommendations = clubRecommendationService.getRecommendationsForUser(userId);
+        return recommendations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(recommendations);
     }
 }
 

@@ -6,11 +6,13 @@ import com.example.campuspulseai.southBound.entity.User;
 import java.util.List;
 
 public interface ISurveyService {
-    List<SurveyQuestionDTO> getAllSurveyQuestions();
+
 
     void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses);
 
-    public boolean isSurveyCompleted();
+    boolean isSurveyCompleted();
 
-    public User getAuthenticatedUser();
+    User getAuthenticatedUser();
+
+    List<SurveyQuestionDTO> getAllSurveyQuestions();
 }
