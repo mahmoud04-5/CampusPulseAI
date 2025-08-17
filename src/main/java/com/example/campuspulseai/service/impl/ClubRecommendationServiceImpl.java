@@ -2,12 +2,13 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.service.IClubRecommendationService;
 import com.example.campuspulseai.service.ISurveyService;
+import com.example.campuspulseai.service.Impl.AIService;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.QuestionChoices;
 import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.repository.IClubRepository;
-import com.example.campuspulseai.southbound.repository.ISurveyUserAnswersRepository;
+import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
             return List.of();
         }
 
-        List<SurveyUserAnswers> surveyUserAnswers = user.getSurveyUserAnswers();
+        List<SurveyUserAnswers> surveyUserAnswers = null;//user.getSurveyUserAnswers();
         if (surveyUserAnswers == null || surveyUserAnswers.isEmpty()) {
             return List.of();
         }

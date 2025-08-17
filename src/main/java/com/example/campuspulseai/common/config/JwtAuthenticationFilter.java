@@ -33,6 +33,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        // Skip authentication for public endpoints
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/api/auth/register") ||
+                requestURI.startsWith("/api/auth/login") ||
+                requestURI.startsWith("/docs") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/webjars") ||
+                requestURI.startsWith("/swagger-resources") ||
+                requestURI.equals("/api/auth") ||
+                requestURI.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         final String jwt = extractJwtFromRequest(request);
         if (jwt == null) {
             filterChain.doFilter(request, response);
