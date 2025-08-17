@@ -40,7 +40,6 @@ public class GetEventResponse {
         this.description = description;
         this.startTime = timeDate;
         if (club != null) {
-            this.location = club.getName();
             this.imageUrl = club.getLogoUrl();
             //this.eventCategory = club.getClubCategory();  No such club category
         }

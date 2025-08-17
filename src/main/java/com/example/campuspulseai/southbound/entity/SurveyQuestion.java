@@ -8,7 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+
 
 @Entity
 @Table(name = "survey_questions")
@@ -20,20 +22,11 @@ public class SurveyQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
-    private String question;
-
-    private String category;
-
-
+    @Column(name = "allow_mulltiple_answers", nullable = false)
     private Boolean allowMultipleAnswers = false;
 
-    @OneToMany(mappedBy = "question",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER)
-
-    private List<QuestionChoices> choices;
+    @Column(name = "question")
+    private String questionText;
 
     @CreationTimestamp
     @Column(nullable = false)
@@ -42,4 +35,9 @@ public class SurveyQuestion {
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "surveyQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<QuestionChoices> choices;
+
+
 }

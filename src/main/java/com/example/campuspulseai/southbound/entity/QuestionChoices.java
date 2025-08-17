@@ -34,8 +34,9 @@ public class QuestionChoices {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-    public String getCategory() {
-        return question != null ? question.getCategory() : null;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "survey_question_id", nullable = false) // FK column in your DB
+    private SurveyQuestion surveyQuestion;
+
 
 }

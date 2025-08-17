@@ -23,8 +23,8 @@ public class Club {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(nullable = false, length = 255)
-    private String name;
+    @Column(name = "name",nullable = false, length = 255)
+    private String clubName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
