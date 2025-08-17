@@ -2,6 +2,8 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
 import com.example.campuspulseai.service.ISurveyService;
+import com.example.campuspulseai.southbound.entity.QuestionChoices;
+import com.example.campuspulseai.southbound.entity.SurveyQuestion;
 import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
@@ -11,6 +13,7 @@ import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
