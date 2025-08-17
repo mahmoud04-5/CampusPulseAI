@@ -1,6 +1,7 @@
 package com.example.campuspulseai.northbound.controller;
 
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
@@ -35,11 +36,12 @@ public class EventController {
         return eventService.createEvent(createEventRequest);
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Update an existing event", description = "Updates an existing event with the provided details.")
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CreateEventResponse updateEvent(CreateEventRequest createEventRequest) {
-        return eventService.updateEvent(createEventRequest);
+    public CreateEventResponse updateEvent(@PathVariable Long id, @Valid @RequestBody EditEventRequest editEventRequest) throws Exception {
+        return eventService.updateEvent(id, editEventRequest);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -47,27 +49,27 @@ public class EventController {
             description = "Retrieves a list of all events, offering options for pagination and filtering. Optional ClubId parameter to filter events for a certain club.")
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getAllEvents() {
-        // Logic to get all events
-        //TODO: Implement pagination!, add option to filter by date, location, etc.
-        return eventService.getAllEventsForCurrentUser();
+    public List<GetEventResponse> getAllEvents(
+            @RequestParam(required = false) Long clubId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventDateTime,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size
+    ) {
+        return eventService.getAllEventsWithFilters(clubId, eventDateTime, page, size);
     }
 
     @Operation(summary = "Get event details", description = "Retrieves detailed info for a specific event by its ID.")
     @GetMapping("/details/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GetEventResponse> getEventDetails(@PathVariable Long id) {
-        GetEventResponse eventDetails = eventService.getEventDetails(id);
-        return eventDetails != null ?
-                ResponseEntity.ok(eventDetails) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(eventService.getEventDetails(id));
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Delete event by ID", description = "Deletes an event by its ID.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEventById(@PathVariable Long id) {
-        // Logic to delete the event by ID
+    public void deleteEventById(@PathVariable Long id) throws Exception {
         eventService.deleteEventById(id);
     }
 

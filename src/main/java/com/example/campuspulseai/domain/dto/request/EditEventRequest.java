@@ -1,17 +1,20 @@
 package com.example.campuspulseai.domain.dto.request;
 
-import com.example.campuspulseai.domain.validation.ValidCategory;
-import jakarta.validation.constraints.*;
+import com.example.campuspulseai.common.validation.ValidCategoryNullable;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Setter
-@Getter
 @AllArgsConstructor
-public class CreateEventRequest {
+@Getter
+@Setter
+public class EditEventRequest {
     @Size(min = 1, max = 50, message = "Title must be between 1 and 50 characters")
     private String title;
 
@@ -19,7 +22,6 @@ public class CreateEventRequest {
     private String description;
 
     @Future
-    @NotNull
     private LocalDateTime startTime;
 
     @Size(min = 1, max = 50, message = "Location must be between 1 and 50 characters")
@@ -29,10 +31,8 @@ public class CreateEventRequest {
     @Max(2000)
     private Integer capacity;
 
-    @ValidCategory
-    @NotNull(message = "Event category is required")
+    @ValidCategoryNullable
     private String category;
-
 
     private String imageUrl;
 }

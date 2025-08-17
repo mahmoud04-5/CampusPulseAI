@@ -1,7 +1,9 @@
 package com.example.campuspulseai.service.impl;
 
+import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
+import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IEventService;
@@ -11,7 +13,11 @@ import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserEventRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.specification.IEventSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +38,7 @@ public class EventServiceImpl implements IEventService {
     private final IUserEventRepository userEventRepository;
     private final EventMapper eventMapper;
     private final IClubRepository clubRepository;
+    private final IEventSpecifications eventSpecifications;
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
@@ -42,9 +50,17 @@ public class EventServiceImpl implements IEventService {
         return eventMapper.mapToCreateEventResponse(createdEvent);
     }
 
+
     @Override
-    public CreateEventResponse updateEvent(CreateEventRequest createEventRequest) {
-        return null;
+    public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) throws Exception {
+        Event event = getEventFromDBById(id);
+        Club club = clubRepository.getById(event.getClub().getId());
+        User user = authUtils.getAuthenticatedUser();
+        validateUserClubownership(user, club);
+        validateEventTime(event);
+        eventMapper.mapToEventForEdit(editEventRequest, event);
+        Event updatedEvent = eventRepository.save(event);
+        return eventMapper.mapToCreateEventResponse(updatedEvent);
     }
 
     @Override
@@ -53,8 +69,14 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public void deleteEventById(Long id) {
-
+    public void deleteEventById(Long id) throws Exception {
+        Event event = getEventFromDBById(id);
+        Club club = clubRepository.getById(event.getClub().getId());
+        User user = authUtils.getAuthenticatedUser();
+        validateUserClubownership(user, club);
+        validateEventTime(event);
+        event.setIsActive(false);
+        eventRepository.save(event);
     }
 
     @Override
@@ -73,6 +95,18 @@ public class EventServiceImpl implements IEventService {
     public List<GetEventResponse> getEventsAttending() {
         User currentUser = getCurrentUser();
         return List.of();
+    }
+
+    @Override
+    public List<GetEventResponse> getAllEventsWithFilters(Long clubId, LocalDateTime eventDateTime, Integer page, Integer size) {
+        Specification<Event> spec = eventSpecifications.isActive()
+                .and(eventSpecifications.hasClubId(clubId))
+                .and(eventSpecifications.hasEventDate(eventDateTime));
+
+        Pageable pageable = PageRequest.of(page, size);
+        return eventRepository.findAll(spec, pageable).stream()
+                .map(eventMapper::mapToEventResponseDetails)
+                .toList();
     }
 
     @Override
@@ -143,10 +177,11 @@ public class EventServiceImpl implements IEventService {
     @Override
     public GetEventResponse getEventDetails(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
         return eventMapper.mapToEventResponseDetails(event);
 
     }
+
 
     @Override
     public User getCurrentUser() {
@@ -169,6 +204,23 @@ public class EventServiceImpl implements IEventService {
     private Club getCluByOwnerId(Long ownerId) {
         return clubRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own a club"));
+    }
+
+    private Event getEventFromDBById(Long id) {
+        return eventRepository.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+    }
+
+    private void validateUserClubownership(User user, Club club) {
+        if (!Objects.equals(user.getId(), club.getOwner().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to update this event");
+        }
+    }
+
+    private void validateEventTime(Event event) {
+        if (event.getTimeDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot edit an event that has already started");
+        }
     }
 
 }
