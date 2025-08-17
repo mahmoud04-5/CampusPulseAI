@@ -7,6 +7,7 @@ import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.User;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface IEventService {
@@ -36,11 +37,10 @@ public interface IEventService {
 
     List<GetEventResponse> getAttendeesByEventId(Long eventId);
 
+
     List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category);
 
     GetEventResponse getEventDetails(Long id);
-
-    User getCurrentUser();
 
     User getDummyUser();
 }

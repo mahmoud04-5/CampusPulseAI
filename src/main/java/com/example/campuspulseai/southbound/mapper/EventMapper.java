@@ -30,4 +30,6 @@ public interface EventMapper {
     @Mapping(target = "timeDate", source = "startTime")
         // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
+
+    Event mapToEvent(CreateEventRequest createEventRequest);
 }
