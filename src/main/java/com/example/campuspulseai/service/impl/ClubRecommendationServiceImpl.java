@@ -1,8 +1,8 @@
 package com.example.campuspulseai.service.impl;
 
+import com.example.campuspulseai.service.IAiService;
 import com.example.campuspulseai.service.IClubRecommendationService;
 import com.example.campuspulseai.service.ISurveyService;
-import com.example.campuspulseai.service.Impl.AIService;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.QuestionChoices;
 import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
@@ -24,7 +24,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
     private final IUserRepository userRepository;
     private final IClubRepository clubRepository;
     private final ISurveyService surveyService;
-    private final AIService aiService;
+    private final IAiService aiService;
     private final IQuestionChoicesRepository questionChoicesRepository;
 
     @Override

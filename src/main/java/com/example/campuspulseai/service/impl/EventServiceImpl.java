@@ -6,13 +6,11 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
 import com.example.campuspulseai.southbound.mapper.EventMapper;
-import com.example.campuspulseai.southbound.repository.IClubRepository;
-import com.example.campuspulseai.southbound.repository.IEventRepository;
-import com.example.campuspulseai.southbound.repository.IUserEventRepository;
-import com.example.campuspulseai.southbound.repository.IUserRepository;
+import com.example.campuspulseai.southbound.repository.*;
 import com.example.campuspulseai.southbound.specification.IEventSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -39,6 +38,8 @@ public class EventServiceImpl implements IEventService {
     private final EventMapper eventMapper;
     private final IClubRepository clubRepository;
     private final IEventSpecifications eventSpecifications;
+    private final IEventRecommendationService eventRecommendationService;
+    private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
@@ -54,7 +55,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) throws Exception {
         Event event = getEventFromDBById(id);
-        Club club = clubRepository.getById(event.getClub().getId());
+        Club club = event.getClub();
         User user = authUtils.getAuthenticatedUser();
         validateUserClubownership(user, club);
         validateEventTime(event);
@@ -71,7 +72,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public void deleteEventById(Long id) throws Exception {
         Event event = getEventFromDBById(id);
-        Club club = clubRepository.getById(event.getClub().getId());
+        Club club = event.getClub();
         User user = authUtils.getAuthenticatedUser();
         validateUserClubownership(user, club);
         validateEventTime(event);
@@ -80,7 +81,34 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> suggestEventsToAttend() {
+    @Transactional
+    public List<GetEventResponse> suggestEventsToAttend(int limit) throws Exception {
+        User user = authUtils.getAuthenticatedUser();
+        List<Event> suggestedEvents = suggestedUserEventsRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(SuggestedUserEvent::getEvent)
+                .toList();
+        if (!suggestedEvents.isEmpty()) {
+            return suggestedEvents.stream()
+                    .map(eventMapper::mapToEventResponseDetails)
+                    .limit(limit)
+                    .toList();
+        }
+        Long[] eventIds = eventRecommendationService.getRecommendedEventIds(user.getId());
+        if (eventIds != null && eventIds.length > 0) {
+            List<Event> savedEvents = eventRepository.findAllById(List.of(eventIds)).stream()
+                    .toList();
+
+
+            suggestedUserEventsRepository.saveAll(savedEvents.stream()
+                    .map(event -> eventMapper.mapToSuggestedUserEvent(event, user))
+                    .toList()
+            );
+            return savedEvents.stream()
+                    .map(eventMapper::mapToEventResponseDetails)
+                    .limit(limit)
+                    .toList();
+        }
         return List.of();
     }
 

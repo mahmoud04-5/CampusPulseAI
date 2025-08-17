@@ -2,35 +2,33 @@ package com.example.campuspulseai.southbound.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
+@Table(name = "suggested_user_events")
 @Entity
-@Table(name = "questions_choices")
-@Data
 @AllArgsConstructor
+@Setter
+@Getter
 @NoArgsConstructor
-public class QuestionChoices {
+public class SuggestedUserEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id", nullable = false)
-    private SurveyQuestion question;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
-    @Column(columnDefinition = "TEXT")
-    private String choice;
+    @ManyToOne
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
+    private Event event;
 
     @CreationTimestamp
     @Column(nullable = false)
     private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private Timestamp updatedAt;
 }

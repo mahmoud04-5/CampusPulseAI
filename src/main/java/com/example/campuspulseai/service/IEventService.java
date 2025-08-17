@@ -23,7 +23,7 @@ public interface IEventService {
 
     List<GetEventResponse> getAllEventsWithFilters(Long clubId, LocalDateTime eventDateTime, Integer page, Integer size);
 
-    List<GetEventResponse> suggestEventsToAttend();
+    List<GetEventResponse> suggestEventsToAttend(int limit) throws Exception;
 
     List<GetEventResponse> suggestEventsToCreate();
 

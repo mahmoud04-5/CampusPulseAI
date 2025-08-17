@@ -5,6 +5,8 @@ import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.Event;
+import com.example.campuspulseai.southbound.entity.SuggestedUserEvent;
+import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -30,4 +32,8 @@ public interface EventMapper {
     @Mapping(target = "timeDate", source = "startTime")
         // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    SuggestedUserEvent mapToSuggestedUserEvent(Event event, User user);
 }

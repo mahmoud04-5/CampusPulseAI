@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -36,7 +35,7 @@ public class SurveyQuestion {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "surveyQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<QuestionChoices> choices;
 
 
