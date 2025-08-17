@@ -177,7 +177,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public GetEventResponse getEventDetails(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
         return eventMapper.mapToEventResponseDetails(event);
 
     }

@@ -62,10 +62,7 @@ public class EventController {
     @GetMapping("/details/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GetEventResponse> getEventDetails(@PathVariable Long id) {
-        GetEventResponse eventDetails = eventService.getEventDetails(id);
-        return eventDetails != null ?
-                ResponseEntity.ok(eventDetails) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(eventService.getEventDetails(id));
     }
 
     @PreAuthorize("hasRole('ORGANIZER')")
