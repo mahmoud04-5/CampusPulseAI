@@ -26,7 +26,6 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
 
     private final IUserRepository userRepository;
     private final IClubRepository clubRepository;
-    private final ISurveyService surveyService;
     private final AIService aiService;
     private final IQuestionChoicesRepository questionChoicesRepository;
     private final IUserRecommendedClubRepository userRecommendedClubRepository;
