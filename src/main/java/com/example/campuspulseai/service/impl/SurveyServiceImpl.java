@@ -28,16 +28,16 @@ public class SurveyServiceImpl implements ISurveyService {
     }
 
     @Override
-    public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
+    public void submitSurveyResponse(List<SurveyQuestionDTO> surveyresponses) {
         User user = getAuthenticatedUser();
-        surveyResponses.forEach(surveyQuestionDTO -> {
-            if (surveyQuestionDTO.getChoices() == null || surveyQuestionDTO.getChoices().isEmpty()) {
+        surveyresponses.forEach(surveyQuestiondto -> {
+            if (surveyQuestiondto.getChoices() == null || surveyQuestiondto.getChoices().isEmpty()) {
                 throw new IllegalArgumentException("Survey answer cannot be null or empty");
             } else {
-                surveyQuestionDTO.getSelectedChoicesIds().forEach(choiceId -> {
+                surveyQuestiondto.getSelectedChoicesIds().forEach(choiceId -> {
                     SurveyUserAnswers surveyUserAnswers = new SurveyUserAnswers();
                     surveyUserAnswers.setUser(user); //sets the user field of the SurveyUserAnswers object to the authenticated User retrieved earlier.
-                    //surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestionDTO.getQuestionId())
+                    //surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestiondto.getQuestionId())
                     //  .orElseThrow(() -> new IllegalArgumentException("Survey question not found")));
                     //surveyUserAnswers.setChoice(questionChoicesRepository.findById(choiceId)
                     //.orElseThrow(() -> new IllegalArgumentException("Choice not found")));

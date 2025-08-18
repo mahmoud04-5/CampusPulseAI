@@ -8,6 +8,8 @@ import com.example.campuspulseai.southbound.entity.Event;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
@@ -30,4 +32,8 @@ public interface EventMapper {
     @Mapping(target = "timeDate", source = "startTime")
         // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
+
+    @Mapping(source = "startDate", target = "startTime")
+    @Mapping(source = "category", target = "eventCategory")
+    List<GetEventResponse> toGetEventResponseList(List<Event> events);
 }

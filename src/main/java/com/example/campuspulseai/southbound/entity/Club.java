@@ -1,6 +1,7 @@
 package com.example.campuspulseai.southbound.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,18 +30,24 @@ public class Club {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
     @Column(nullable = false)
-    private Boolean isActive = true;
+    private boolean isActive = true;
 
     @CreationTimestamp
     @Column(nullable = false)
     private Timestamp createdAt;
-
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
+
+    public Club(String name, String description, String logoUrl, User owner) {
+        this.name = name;
+        this.description = description;
+        this.logoUrl = logoUrl;
+        this.owner = owner;
+    }
 }
+
