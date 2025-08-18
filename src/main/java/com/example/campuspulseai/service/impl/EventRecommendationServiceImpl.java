@@ -2,12 +2,12 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
+import com.example.campuspulseai.domain.dto.SuggestedEventParts;
 import com.example.campuspulseai.service.IAiService;
 import com.example.campuspulseai.service.IEventRecommendationService;
-import com.example.campuspulseai.southbound.entity.Event;
-import com.example.campuspulseai.southbound.entity.QuestionChoices;
-import com.example.campuspulseai.southbound.entity.SurveyQuestion;
-import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
+import com.example.campuspulseai.southbound.Enum.Category;
+import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,19 +32,19 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
     private final IAiService aiService;
     private final IEventRepository eventRepository;
     private final IEventSpecifications eventSpecifications;
+    private final EventMapper eventMapper;
 
     @Override
     public Long[] getRecommendedEventIds(Long userId) {
-        // Fetch user answers from the repository
-        SurveyUserAnswers userAnswers = surveyUserAnswersRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
+
+        SurveyUserAnswers userAnswers = getUserAnswersByUserId(userId);
 
         List<SurveyQuestion> questions = surveyQuestionRepository.findAll();
         List<QuestionChoices> choices = questionChoicesRepository.findAll();
 
         List<Event> events = getEventsToSuggestFrom();
 
-        String prompt = BuildEventRecommendationPrompt(questions, choices, userAnswers, events);
+        String prompt = buildEventRecommendationPrompt(questions, choices, userAnswers, events);
 
         String response = aiService.chat(prompt);
 
@@ -54,7 +56,23 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
 
     }
 
-    private String BuildEventRecommendationPrompt(List<SurveyQuestion> questions, List<QuestionChoices> choices, SurveyUserAnswers userAnswers, List<Event> events) {
+    public List<SuggestedOrganizerEvent> getSuggestedOrganizerEvents() {
+        List<SurveyUserAnswers> allUserAnswers = surveyUserAnswersRepository.findAll();
+        List<SurveyQuestion> questions = surveyQuestionRepository.findAll();
+        List<QuestionChoices> choices = questionChoicesRepository.findAll();
+
+        String prompt = buildEventRecommendationPromptForOrganizers(
+                questions,
+                choices,
+                allUserAnswers,
+                Arrays.stream(Category.values()).toList());
+
+        String response = aiService.chat(prompt);
+
+        return splitSuggestedEventsForCreationResponse(response);
+    }
+
+    private String buildEventRecommendationPrompt(List<SurveyQuestion> questions, List<QuestionChoices> choices, SurveyUserAnswers userAnswers, List<Event> events) {
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("You are an event recommendation system.\n");
         promptBuilder.append("The goal is to recommend events that best match the user's survey answers.\n\n");
@@ -116,4 +134,91 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         }
         return events;
     }
+
+    private String buildEventRecommendationPromptForOrganizers(List<SurveyQuestion> questions,
+                                                               List<QuestionChoices> choices,
+                                                               List<SurveyUserAnswers> userAnswers,
+                                                               List<Category> categories) {
+        StringBuilder promptBuilder = new StringBuilder();
+
+        promptBuilder.append("You are an event recommendation assistant.\n");
+        promptBuilder.append("The goal is to generate 3 creative event ideas that best match the user's survey answers.\n");
+        promptBuilder.append("Each event idea must contain:\n");
+        promptBuilder.append("- a short engaging TITLE\n");
+        promptBuilder.append("- a concise DESCRIPTION (1–2 sentences)\n");
+        promptBuilder.append("- the most relevant CATEGORY (chosen strictly from the provided enum categories)\n\n");
+
+        // Append survey questions & choices
+        promptBuilder.append("### Survey Questions & Choices:\n");
+        for (SurveyQuestion q : questions) {
+            promptBuilder.append("{")
+                    .append("\"id\": ").append(q.getId()).append(", ")
+                    .append("\"question\": \"").append(q.getQuestionText()).append("\"")
+                    .append(", \"choices\": [");
+            choices.stream()
+                    .filter(c -> c.getQuestion().getId().equals(q.getId()))
+                    .forEach(c -> promptBuilder.append("{\"id\": ").append(c.getId())
+                            .append(", \"choice\": \"").append(c.getChoice()).append("\"}, "));
+            if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+                promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+            }
+            promptBuilder.append("]}\n");
+        }
+
+        // Append user answers
+        promptBuilder.append("\n### User Answers:\n[");
+        for (SurveyUserAnswers ans : userAnswers) {
+            promptBuilder.append(ans.getQuestionAnswers()).append(", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+        }
+        promptBuilder.append("]\n\n");
+
+        // Append enum categories
+        promptBuilder.append("### Event Categories (enum values):\n[");
+        for (Category c : categories) {
+            promptBuilder.append("\"").append(c.getCategory()).append("\", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length());
+        }
+        promptBuilder.append("]\n\n");
+
+        // Append task
+        promptBuilder.append("### Task:\n")
+                .append("Based on the survey answers, suggest 3 new event ideas.\n")
+                .append("Return the result STRICTLY in the format:\n")
+                .append("title&description&category@title&description&category@title&description&category\n")
+                .append("DO NOT forget the format separate the 3 suggested event objects with '&' and separate the suggested events with '@'\n")
+                .append("do not include At('@') or ampersands('&') in the title, description, or category.\n")
+                .append("Do not include explanations or any extra text.\n");
+
+        return promptBuilder.toString();
+    }
+
+    private SurveyUserAnswers getUserAnswersByUserId(Long userId) {
+        // Fetch user answers from the repository
+        return surveyUserAnswersRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
+
+    }
+
+    private List<SuggestedOrganizerEvent> splitSuggestedEventsForCreationResponse(String response) {
+        List<SuggestedOrganizerEvent> events = new ArrayList<>();
+
+        // Split the response into individual event strings
+        String[] eventStrings = response.split("@");
+
+        for (String eventString : eventStrings) {
+            String[] parts = eventString.split("&");
+            if (parts.length != 3) {
+                throw new IllegalArgumentException("Invalid response format. Expected format: title&description&category");
+            }
+
+            events.add(eventMapper.mapToSuggestedOrganizerEvent(new SuggestedEventParts(parts)));
+        }
+        return events;
+    }
+
 }

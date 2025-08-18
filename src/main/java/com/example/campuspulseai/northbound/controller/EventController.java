@@ -4,6 +4,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -74,6 +75,7 @@ public class EventController {
     }
 
 
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Suggests events to attend", description = "Searches for events based on user preferences.")
     @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
@@ -83,10 +85,11 @@ public class EventController {
         return eventService.suggestEventsToAttend(limit);
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Suggest events to create", description = "Suggests events that the Organizer might want to create based on students interests.")
     @GetMapping("/create-suggestions")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> suggestEventsToCreate() {
+    public List<GetEventSuggestionResponse> suggestEventsToCreate() {
         return eventService.suggestEventsToCreate();
     }
 

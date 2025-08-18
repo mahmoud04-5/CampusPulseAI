@@ -6,6 +6,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
 import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
@@ -25,7 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,7 @@ public class EventServiceImpl implements IEventService {
     private final IEventSpecifications eventSpecifications;
     private final IEventRecommendationService eventRecommendationService;
     private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
+    private final ISuggestedOrganizerEventsRepository suggestedOrganizerEventsRepository;
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws Exception {
@@ -113,8 +114,20 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> suggestEventsToCreate() {
-        return List.of();
+    @Transactional
+    public List<GetEventSuggestionResponse> suggestEventsToCreate() {
+        List<SuggestedOrganizerEvent> suggestedEvents = suggestedOrganizerEventsRepository.findAll();
+        if (suggestedEvents.isEmpty()) {
+            List<SuggestedOrganizerEvent> newSuggestions = eventRecommendationService.getSuggestedOrganizerEvents();
+            suggestedOrganizerEventsRepository.saveAll(newSuggestions);
+            return newSuggestions
+                    .stream()
+                    .map(eventMapper::mapToGetEventSuggestionResponse)
+                    .toList();
+        }
+        return suggestedEvents.stream()
+                .map(eventMapper::mapToGetEventSuggestionResponse)
+                .toList();
     }
 
 
@@ -199,7 +212,7 @@ public class EventServiceImpl implements IEventService {
         return events.stream()
                 .filter(e -> e.getStartDate().isAfter(filterDate) && e.getStartDate() != null)
                 .map(eventMapper::mapToEventResponseDetails)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
