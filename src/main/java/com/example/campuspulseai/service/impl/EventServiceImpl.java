@@ -23,7 +23,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,19 +107,16 @@ public class EventServiceImpl implements IEventService {
     public List<GetEventResponse> getAllEventsForCurrentUser() {
         User dummyUser = getDummyUser();
         List<UserEvent> userEvents = userEventRepository.findByUserId(dummyUser.getId());
+
         return userEvents.stream()
                 .map(userEvent -> {
                     Event event = eventRepository.findById(userEvent.getEventId())
                             .orElseThrow(() -> new RuntimeException("Event not found with id: " + userEvent.getEventId()));
-                    return new GetEventResponse(
-                            event.getId(),
-                            event.getTitle(),
-                            event.getDescription(),
-                            event.getStartDate()
-                    );
+                    return eventMapper.mapToEventResponseDetails(event);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
+
 
     @Override
     public void attendEvent(Long eventId) {
@@ -160,24 +156,18 @@ public class EventServiceImpl implements IEventService {
 
         return events.stream()
                 .filter(e -> e.getStartDate() != null && e.getStartDate().isAfter(filterDate))
-                .map(e -> new GetEventResponse(
-                        e.getId(),
-                        e.getTitle(),
-                        e.getClub(),
-                        e.getDescription(),
-                        e.getStartDate()
-                ))
+                .map(eventMapper::mapToEventResponseDetails)
                 .toList();
+
     }
 
 
     @Override
     public GetEventResponse getEventDetails(Long id) {
         Event event = getEventFromDBById(id);
-        return new GetEventResponse(
-                event.getId(), event.getTitle(), event.getClub(), event.getDescription(), event.getStartDate()
-        );
+        return eventMapper.mapToEventResponseDetails(event);
     }
+
 
     @Override
     public User getDummyUser() {

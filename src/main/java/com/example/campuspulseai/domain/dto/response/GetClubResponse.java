@@ -1,12 +1,12 @@
 package com.example.campuspulseai.domain.dto.response;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
-
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GetClubResponse {
 
     // Core Club Information

@@ -1,9 +1,11 @@
 package com.example.campuspulseai.northbound.controller;
 
-
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
+import com.example.campuspulseai.southbound.entity.Club;
+import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
+import com.example.campuspulseai.service.IClubRecommendationService;
 import com.example.campuspulseai.service.IClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
@@ -21,6 +25,7 @@ public class ClubController {
 
 
     private final IClubService clubService;
+    private final IClubRecommendationService clubRecommendationService;
 
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
@@ -55,5 +60,17 @@ public class ClubController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return clubService.getClubs(query, page, size);
     }
+
+    @Operation(
+            summary = "Get Club Recommendations",
+            description = "Retrieves personalized club recommendations for a user based on their survey responses."
+    )
+    @GetMapping("/recommendations/{userId}")
+    public ResponseEntity<List<GetClubResponse>> getRecommendationsForUser(@PathVariable Long userId) {
+        List<GetClubResponse> recommendations = clubRecommendationService.getRecommendationsForUser(userId);
+        return ResponseEntity.ok(recommendations);
+    }
+
+
 }
 

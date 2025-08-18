@@ -74,7 +74,7 @@ public class SecurityConfig {
                                         SWAGGER_HTML,
                                         AUTH_BASE
                                 ).permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint()))
