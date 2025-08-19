@@ -32,17 +32,16 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
     private final IEventSpecifications eventSpecifications;
 
     @Override
-    public Long[] getRecommendedEventIds(Long userId) {
-        // Fetch user answers from the repository
-        SurveyUserAnswers userAnswers = surveyUserAnswersRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
+    public List<Long> getRecommendedEventIds(Long userId) {
+
+        SurveyUserAnswers userAnswers = getSurveyUserAnswersfromDb(userId);
 
         List<SurveyQuestion> questions = surveyQuestionRepository.findAll();
         List<QuestionChoices> choices = questionChoicesRepository.findAll();
 
         List<Event> events = getEventsToSuggestFrom();
 
-        String prompt = BuildEventRecommendationPrompt(questions, choices, userAnswers, events);
+        String prompt = buildEventRecommendationPrompt(questions, choices, userAnswers, events);
 
         String response = aiService.chat(prompt);
 
@@ -50,16 +49,35 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         return eventIds.stream()
                 .map(String::trim)
                 .map(Long::valueOf)
-                .toArray(Long[]::new);
+                .toList();
 
     }
 
-    private String BuildEventRecommendationPrompt(List<SurveyQuestion> questions, List<QuestionChoices> choices, SurveyUserAnswers userAnswers, List<Event> events) {
+    private String buildEventRecommendationPrompt(List<SurveyQuestion> questions, List<QuestionChoices> choices, SurveyUserAnswers userAnswers, List<Event> events) {
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("You are an event recommendation system.\n");
         promptBuilder.append("The goal is to recommend events that best match the user's survey answers.\n\n");
 
-// Append survey questions & choices
+        appendSurveyQuestionsAndChoices(promptBuilder, questions, choices);
+
+        appendUserAnswers(promptBuilder, userAnswers);
+
+        appendEvents(promptBuilder, events);
+
+        promptBuilder.append("### Task:\n")
+                .append("Based on the survey answers, recommend 5 events that best fit this user.\n")
+                .append("Return ONLY the event IDs as a comma-separated list, no explanations.\n");
+
+        return promptBuilder.toString();
+    }
+
+    private void cleanTrailingComma(StringBuilder promptBuilder) {
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+        }
+    }
+
+    private void appendSurveyQuestionsAndChoices(StringBuilder promptBuilder, List<SurveyQuestion> questions, List<QuestionChoices> choices) {
         promptBuilder.append("### Survey Questions & Choices:\n");
         for (SurveyQuestion q : questions) {
             promptBuilder.append("{")
@@ -70,17 +88,18 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
                     .filter(c -> c.getQuestion().getId().equals(q.getId()))
                     .forEach(c -> promptBuilder.append("{\"id\": ").append(c.getId())
                             .append(", \"choice\": \"").append(c.getChoice()).append("\"}, "));
-            if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-                promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-            }
+            cleanTrailingComma(promptBuilder);
             promptBuilder.append("]}\n");
         }
+    }
 
+    private void appendUserAnswers(StringBuilder promptBuilder, SurveyUserAnswers userAnswers) {
         promptBuilder.append("\n### User Answers:\n")
                 .append(userAnswers.getQuestionAnswers()) // JSONB Map<String,Object>
                 .append("\n\n");
+    }
 
-        // Append event objects with selected fields
+    private void appendEvents(StringBuilder promptBuilder, List<Event> events) {
         promptBuilder.append("### Events:\n[");
         for (Event e : events) {
             promptBuilder.append("{")
@@ -92,17 +111,8 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
                     .append("\"capacity\": ").append(e.getCapacity())
                     .append("}, ");
         }
-        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-        }
+        cleanTrailingComma(promptBuilder);
         promptBuilder.append("]\n\n");
-
-// Append task
-        promptBuilder.append("### Task:\n")
-                .append("Based on the survey answers, recommend 5 events that best fit this user.\n")
-                .append("Return ONLY the event IDs as a comma-separated list, no explanations.\n");
-
-        return promptBuilder.toString();
     }
 
     private List<Event> getEventsToSuggestFrom() {
@@ -115,5 +125,10 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
             throw new ResourceNotFoundException("No active events found within the next 90 days.");
         }
         return events;
+    }
+
+    private SurveyUserAnswers getSurveyUserAnswersfromDb(Long userId) {
+        return surveyUserAnswersRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
     }
 }

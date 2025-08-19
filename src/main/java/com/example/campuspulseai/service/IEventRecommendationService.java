@@ -1,5 +1,7 @@
 package com.example.campuspulseai.service;
 
+import java.util.List;
+
 public interface IEventRecommendationService {
-    Long[] getRecommendedEventIds(Long userId);
+    List<Long> getRecommendedEventIds(Long userId);
 }
