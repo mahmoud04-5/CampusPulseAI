@@ -38,7 +38,6 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     SuggestedUserEvent mapToSuggestedUserEvent(Event event, User user);
-}
 
     @Mapping(source = "startDate", target = "startTime")
     @Mapping(source = "category", target = "eventCategory")

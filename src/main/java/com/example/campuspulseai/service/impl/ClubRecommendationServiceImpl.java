@@ -56,7 +56,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
 
         // Map AI recommendations to Club entities
         return recommendedClubNames.stream()
-                .map(name -> clubRepository.findByClubNameIgnoreCase(name)
+                .map(name -> clubRepository.findByNameIgnoreCase(name)
                         .orElse(null))
                 .filter(club -> club != null)
                 .limit(5)

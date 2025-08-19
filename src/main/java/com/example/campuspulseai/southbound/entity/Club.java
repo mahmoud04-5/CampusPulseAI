@@ -1,7 +1,6 @@
 package com.example.campuspulseai.southbound.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,8 +23,8 @@ public class Club {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(name = "name",nullable = false, length = 255)
-    private String clubName;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
