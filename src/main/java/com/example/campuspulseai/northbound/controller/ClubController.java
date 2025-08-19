@@ -67,8 +67,7 @@ public class ClubController {
     )
     @GetMapping("/recommendations/{userId}")
     public ResponseEntity<List<GetClubResponse>> getRecommendationsForUser(@PathVariable Long userId) {
-        List<GetClubResponse> recommendations = clubRecommendationService.getRecommendationsForUser(userId);
-        return ResponseEntity.ok(recommendations);
+        return ResponseEntity.ok(clubRecommendationService.getRecommendationsForUser(userId));
     }
 
 

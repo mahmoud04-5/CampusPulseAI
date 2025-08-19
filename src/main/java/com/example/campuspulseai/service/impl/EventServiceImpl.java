@@ -203,7 +203,7 @@ public class EventServiceImpl implements IEventService {
 
 
 
-    // Helper
+    // ---------- Helper methods ----------
     private Event getEventFromDBById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
