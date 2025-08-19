@@ -96,51 +96,18 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
                                                                List<Category> categories) {
         StringBuilder promptBuilder = new StringBuilder();
 
-        promptBuilder.append("You are an event recommendation assistant.\n");
-        promptBuilder.append("The goal is to generate 3 creative event ideas that best match the user's survey answers.\n");
-        promptBuilder.append("Each event idea must contain:\n");
-        promptBuilder.append("- a short engaging TITLE\n");
-        promptBuilder.append("- a concise DESCRIPTION (1–2 sentences)\n");
-        promptBuilder.append("- the most relevant CATEGORY (chosen strictly from the provided enum categories)\n\n");
+        promptBuilder.append("You are an event recommendation assistant.\n")
+                .append("The goal is to generate 3 creative event ideas that best match the user's survey answers.\n")
+                .append("Each event idea must contain:\n")
+                .append("- a short engaging TITLE\n")
+                .append("- a concise DESCRIPTION (1–2 sentences)\n")
+                .append("- the most relevant CATEGORY (chosen strictly from the provided enum categories)\n\n");
 
-        // Append survey questions & choices
-        promptBuilder.append("### Survey Questions & Choices:\n");
-        for (SurveyQuestion q : questions) {
-            promptBuilder.append("{")
-                    .append("\"id\": ").append(q.getId()).append(", ")
-                    .append("\"question\": \"").append(q.getQuestionText()).append("\"")
-                    .append(", \"choices\": [");
-            choices.stream()
-                    .filter(c -> c.getQuestion().getId().equals(q.getId()))
-                    .forEach(c -> promptBuilder.append("{\"id\": ").append(c.getId())
-                            .append(", \"choice\": \"").append(c.getChoice()).append("\"}, "));
-            if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-                promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-            }
-            promptBuilder.append("]}\n");
-        }
 
-        // Append user answers
-        promptBuilder.append("\n### User Answers:\n[");
-        for (SurveyUserAnswers ans : userAnswers) {
-            promptBuilder.append(ans.getQuestionAnswers()).append(", ");
-        }
-        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-        }
-        promptBuilder.append("]\n\n");
+        appendSurveyQuestionsAndChoices(promptBuilder, questions, choices);
+        appendUserAnswersList(promptBuilder, userAnswers);
+        appendCategoryEnum(promptBuilder, categories);
 
-        // Append enum categories
-        promptBuilder.append("### Event Categories (enum values):\n[");
-        for (Category c : categories) {
-            promptBuilder.append("\"").append(c.getCategory()).append("\", ");
-        }
-        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length());
-        }
-        promptBuilder.append("]\n\n");
-
-        // Append task
         promptBuilder.append("### Task:\n")
                 .append("Based on the survey answers, suggest 3 new event ideas.\n")
                 .append("Return the result STRICTLY in the format:\n")
@@ -212,4 +179,46 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         return surveyUserAnswersRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
     }
+
+    private List<SuggestedOrganizerEvent> splitSuggestedEventsForCreationResponse(String response) {
+        List<SuggestedOrganizerEvent> events = new ArrayList<>();
+
+        // Split the response into individual event strings
+        String[] eventStrings = response.split("@");
+
+        for (String eventString : eventStrings) {
+            String[] parts = eventString.split("&");
+            if (parts.length != 3) {
+                throw new IllegalArgumentException("Invalid response format. Expected format: title&description&category");
+            }
+
+            events.add(eventMapper.mapToSuggestedOrganizerEvent(new SuggestedEventParts(parts)));
+        }
+        return events;
+    }
+
+    private void appendUserAnswersList(StringBuilder promptBuilder, List<SurveyUserAnswers> userAnswers) {
+        // Append user answers
+        promptBuilder.append("\n### User Answers:\n[");
+        for (SurveyUserAnswers ans : userAnswers) {
+            promptBuilder.append(ans.getQuestionAnswers()).append(", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+        }
+        promptBuilder.append("]\n\n");
+    }
+
+    private void appendCategoryEnum(StringBuilder promptBuilder, List<Category> categories) {
+        // Append enum categories
+        promptBuilder.append("### Event Categories (enum values):\n[");
+        for (Category c : categories) {
+            promptBuilder.append("\"").append(c.getCategory()).append("\", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length());
+        }
+        promptBuilder.append("]\n\n");
+    }
+
 }
