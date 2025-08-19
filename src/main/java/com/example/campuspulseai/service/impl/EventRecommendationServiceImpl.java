@@ -35,9 +35,9 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
     private final EventMapper eventMapper;
 
     @Override
-    public Long[] getRecommendedEventIds(Long userId) {
+    public List<Long> getRecommendedEventIds(Long userId) {
 
-        SurveyUserAnswers userAnswers = getUserAnswersByUserId(userId);
+        SurveyUserAnswers userAnswers = getSurveyUserAnswersfromDb(userId);
 
         List<SurveyQuestion> questions = surveyQuestionRepository.findAll();
         List<QuestionChoices> choices = questionChoicesRepository.findAll();
@@ -52,7 +52,7 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         return eventIds.stream()
                 .map(String::trim)
                 .map(Long::valueOf)
-                .toArray(Long[]::new);
+                .toList();
 
     }
 
@@ -77,62 +77,17 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         promptBuilder.append("You are an event recommendation system.\n");
         promptBuilder.append("The goal is to recommend events that best match the user's survey answers.\n\n");
 
-// Append survey questions & choices
-        promptBuilder.append("### Survey Questions & Choices:\n");
-        for (SurveyQuestion q : questions) {
-            promptBuilder.append("{")
-                    .append("\"id\": ").append(q.getId()).append(", ")
-                    .append("\"question\": \"").append(q.getQuestionText()).append("\"")
-                    .append(", \"choices\": [");
-            choices.stream()
-                    .filter(c -> c.getQuestion().getId().equals(q.getId()))
-                    .forEach(c -> promptBuilder.append("{\"id\": ").append(c.getId())
-                            .append(", \"choice\": \"").append(c.getChoice()).append("\"}, "));
-            if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-                promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-            }
-            promptBuilder.append("]}\n");
-        }
+        appendSurveyQuestionsAndChoices(promptBuilder, questions, choices);
 
-        promptBuilder.append("\n### User Answers:\n")
-                .append(userAnswers.getQuestionAnswers()) // JSONB Map<String,Object>
-                .append("\n\n");
+        appendUserAnswers(promptBuilder, userAnswers);
 
-        // Append event objects with selected fields
-        promptBuilder.append("### Events:\n[");
-        for (Event e : events) {
-            promptBuilder.append("{")
-                    .append("\"id\": ").append(e.getId()).append(", ")
-                    .append("\"title\": \"").append(e.getTitle()).append("\", ")
-                    .append("\"description\": \"").append(e.getDescription()).append("\", ")
-                    .append("\"category\": \"").append(e.getCategory()).append("\", ")
-                    .append("\"date\": \"").append(e.getStartDate()).append("\", ")
-                    .append("\"capacity\": ").append(e.getCapacity())
-                    .append("}, ");
-        }
-        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
-            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
-        }
-        promptBuilder.append("]\n\n");
+        appendEvents(promptBuilder, events);
 
-// Append task
         promptBuilder.append("### Task:\n")
                 .append("Based on the survey answers, recommend 5 events that best fit this user.\n")
                 .append("Return ONLY the event IDs as a comma-separated list, no explanations.\n");
 
         return promptBuilder.toString();
-    }
-
-    private List<Event> getEventsToSuggestFrom() {
-        Specification<Event> spec = eventSpecifications.isActive()
-                .and(eventSpecifications.hasEventWithinGivenDays());
-        List<Event> events = eventRepository.findAll(spec)
-                .stream()
-                .toList();
-        if (events.isEmpty()) {
-            throw new ResourceNotFoundException("No active events found within the next 90 days.");
-        }
-        return events;
     }
 
     private String buildEventRecommendationPromptForOrganizers(List<SurveyQuestion> questions,
@@ -197,28 +152,64 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         return promptBuilder.toString();
     }
 
-    private SurveyUserAnswers getUserAnswersByUserId(Long userId) {
-        // Fetch user answers from the repository
-        return surveyUserAnswersRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
-
+    private void cleanTrailingComma(StringBuilder promptBuilder) {
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+        }
     }
 
-    private List<SuggestedOrganizerEvent> splitSuggestedEventsForCreationResponse(String response) {
-        List<SuggestedOrganizerEvent> events = new ArrayList<>();
+    private void appendSurveyQuestionsAndChoices(StringBuilder promptBuilder, List<SurveyQuestion> questions, List<QuestionChoices> choices) {
+        promptBuilder.append("### Survey Questions & Choices:\n");
+        for (SurveyQuestion q : questions) {
+            promptBuilder.append("{")
+                    .append("\"id\": ").append(q.getId()).append(", ")
+                    .append("\"question\": \"").append(q.getQuestionText()).append("\"")
+                    .append(", \"choices\": [");
+            choices.stream()
+                    .filter(c -> c.getQuestion().getId().equals(q.getId()))
+                    .forEach(c -> promptBuilder.append("{\"id\": ").append(c.getId())
+                            .append(", \"choice\": \"").append(c.getChoice()).append("\"}, "));
+            cleanTrailingComma(promptBuilder);
+            promptBuilder.append("]}\n");
+        }
+    }
 
-        // Split the response into individual event strings
-        String[] eventStrings = response.split("@");
+    private void appendUserAnswers(StringBuilder promptBuilder, SurveyUserAnswers userAnswers) {
+        promptBuilder.append("\n### User Answers:\n")
+                .append(userAnswers.getQuestionAnswers()) // JSONB Map<String,Object>
+                .append("\n\n");
+    }
 
-        for (String eventString : eventStrings) {
-            String[] parts = eventString.split("&");
-            if (parts.length != 3) {
-                throw new IllegalArgumentException("Invalid response format. Expected format: title&description&category");
-            }
+    private void appendEvents(StringBuilder promptBuilder, List<Event> events) {
+        promptBuilder.append("### Events:\n[");
+        for (Event e : events) {
+            promptBuilder.append("{")
+                    .append("\"id\": ").append(e.getId()).append(", ")
+                    .append("\"title\": \"").append(e.getTitle()).append("\", ")
+                    .append("\"description\": \"").append(e.getDescription()).append("\", ")
+                    .append("\"category\": \"").append(e.getCategory()).append("\", ")
+                    .append("\"date\": \"").append(e.getStartDate()).append("\", ")
+                    .append("\"capacity\": ").append(e.getCapacity())
+                    .append("}, ");
+        }
+        cleanTrailingComma(promptBuilder);
+        promptBuilder.append("]\n\n");
+    }
 
-            events.add(eventMapper.mapToSuggestedOrganizerEvent(new SuggestedEventParts(parts)));
+    private List<Event> getEventsToSuggestFrom() {
+        Specification<Event> spec = eventSpecifications.isActive()
+                .and(eventSpecifications.hasEventWithinGivenDays());
+        List<Event> events = eventRepository.findAll(spec)
+                .stream()
+                .toList();
+        if (events.isEmpty()) {
+            throw new ResourceNotFoundException("No active events found within the next 90 days.");
         }
         return events;
     }
 
+    private SurveyUserAnswers getSurveyUserAnswersfromDb(Long userId) {
+        return surveyUserAnswersRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
+    }
 }

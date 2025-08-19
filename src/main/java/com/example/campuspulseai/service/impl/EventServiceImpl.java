@@ -85,30 +85,18 @@ public class EventServiceImpl implements IEventService {
     @Transactional
     public List<GetEventResponse> suggestEventsToAttend(int limit) throws Exception {
         User user = authUtils.getAuthenticatedUser();
-        List<Event> suggestedEvents = suggestedUserEventsRepository.findAllByUserId(user.getId())
-                .stream()
-                .map(SuggestedUserEvent::getEvent)
-                .toList();
+        List<Event> suggestedEvents = getSuggestedUserEventsByUserId(user);
+
         if (!suggestedEvents.isEmpty()) {
-            return suggestedEvents.stream()
-                    .map(eventMapper::mapToEventResponseDetails)
-                    .limit(limit)
-                    .toList();
+            return getEventResponsesFromSuggestedEvents(suggestedEvents, limit);
         }
-        Long[] eventIds = eventRecommendationService.getRecommendedEventIds(user.getId());
-        if (eventIds != null && eventIds.length > 0) {
-            List<Event> savedEvents = eventRepository.findAllById(List.of(eventIds)).stream()
-                    .toList();
 
+        List<Long> eventIds = eventRecommendationService.getRecommendedEventIds(user.getId());
+        if (eventIds != null && !eventIds.isEmpty()) {
+            List<Event> savedEvents = getAllEventsByIds(eventIds);
 
-            suggestedUserEventsRepository.saveAll(savedEvents.stream()
-                    .map(event -> eventMapper.mapToSuggestedUserEvent(event, user))
-                    .toList()
-            );
-            return savedEvents.stream()
-                    .map(eventMapper::mapToEventResponseDetails)
-                    .limit(limit)
-                    .toList();
+            saveAllRecommendedEvents(savedEvents, user);
+            return getEventResponsesFromSuggestedEvents(savedEvents, limit);
         }
         return List.of();
     }
@@ -262,6 +250,32 @@ public class EventServiceImpl implements IEventService {
         if (event.getTimeDate().isBefore(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot edit an event that has already started");
         }
+    }
+
+    private List<Event> getSuggestedUserEventsByUserId(User user) {
+        return suggestedUserEventsRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(SuggestedUserEvent::getEvent)
+                .toList();
+    }
+
+    private List<GetEventResponse> getEventResponsesFromSuggestedEvents(List<Event> suggestedEvents, int limit) {
+        return suggestedEvents.stream()
+                .map(eventMapper::mapToEventResponseDetails)
+                .limit(limit)
+                .toList();
+    }
+
+    private List<Event> getAllEventsByIds(List<Long> eventIds) {
+        return eventRepository.findAllById(eventIds).stream()
+                .toList();
+    }
+
+    private void saveAllRecommendedEvents(List<Event> savedEvents, User user) {
+        suggestedUserEventsRepository.saveAll(savedEvents.stream()
+                .map(event -> eventMapper.mapToSuggestedUserEvent(event, user))
+                .toList()
+        );
     }
 
 }
