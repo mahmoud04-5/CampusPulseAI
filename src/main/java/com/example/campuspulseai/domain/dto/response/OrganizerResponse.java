@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class OrganizerResponse {
-    private String organizerName;
-    private Long organizerId;
+    private String firstName;
+    private String lastName;
+    private Long id;
 }

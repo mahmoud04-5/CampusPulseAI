@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import java.nio.file.AccessDeniedException;
+
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
 @RequestMapping("/api/clubs")
 public class ClubController {
-
 
     private final IClubService clubService;
     private final IClubRecommendationService clubRecommendationService;
@@ -31,7 +32,7 @@ public class ClubController {
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    CreateClubResponse createClub(@Valid @RequestBody CreateClubRequest createClubRequest) {
+    CreateClubResponse createClub(@Valid @RequestBody CreateClubRequest createClubRequest) throws AccessDeniedException {
         return clubService.createClub(createClubRequest);
     }
 
@@ -43,13 +44,20 @@ public class ClubController {
     }
 
 
+    @Operation(summary = "Update club by ID", description = "Updates an existing club's information.")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    CreateClubResponse updateClub(@PathVariable Long id,@Valid @RequestBody CreateClubRequest updateClubRequest) throws AccessDeniedException {
+        return clubService.updateClub(id, updateClubRequest);
+    }
+
+
     @Operation(summary = "Delete club by ID", description = "Deletes a club by its ID.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteClubById(@PathVariable Long id) {
+    void deleteClubById(@PathVariable Long id) throws AccessDeniedException {
         clubService.deleteClubById(id);
     }
-
 
     @Operation(summary = "Get clubs / search clubs",
             description = "Retrieves a paginated list of clubs. Optionally filters by a search query.")
@@ -69,4 +77,3 @@ public class ClubController {
         return recommendations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(recommendations);
     }
 }
-

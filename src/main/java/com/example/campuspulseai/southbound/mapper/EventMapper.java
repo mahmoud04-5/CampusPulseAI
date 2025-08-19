@@ -10,6 +10,8 @@ import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
@@ -36,4 +38,9 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     SuggestedUserEvent mapToSuggestedUserEvent(Event event, User user);
+}
+
+    @Mapping(source = "startDate", target = "startTime")
+    @Mapping(source = "category", target = "eventCategory")
+    List<GetEventResponse> toGetEventResponseList(List<Event> events);
 }
