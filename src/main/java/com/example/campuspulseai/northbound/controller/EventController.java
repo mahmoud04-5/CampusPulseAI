@@ -4,6 +4,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -103,11 +104,8 @@ public class EventController {
     @PostMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> attendEvent(@PathVariable Long eventId) {
-
         eventService.attendEvent(eventId);
         return new ResponseEntity<>(HttpStatus.OK);
-
-
     }
 
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
@@ -130,23 +128,18 @@ public class EventController {
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")
     @GetMapping("/{eventId}/attendees")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getAttendeesByEventId(@PathVariable Long eventId) {
-        // Logic to get attendees of an event by event ID
+    public List<GetUserResponse> getAttendeesByEventId(@PathVariable Long eventId) {
         return eventService.getAttendeesByEventId(eventId);
     }
 
+
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")
-    public ResponseEntity<Map<String, Object>> getEvents(
+    public ResponseEntity<List<GetEventResponse>> getEvents(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
             @RequestParam(required = false) String category) {
-        List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, category);
-        Map<String, Object> response = new HashMap<>();
-        response.put("upcomingEvents", upcomingEvents);
-        response.put("message", upcomingEvents.isEmpty() ? "No upcoming events found" : "Upcoming events found");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(eventService.getUpcomingEvents(dateTime, category));
     }
-
 
 }
 

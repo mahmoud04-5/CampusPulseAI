@@ -5,8 +5,11 @@ import com.example.campuspulseai.southbound.entity.Club;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ClubMapper {
     @Mapping(source = "id", target = "clubId")
     GetClubResponse toDto(Club club);
+    List<GetClubResponse> toDtoList(List<Club> clubs);
 }

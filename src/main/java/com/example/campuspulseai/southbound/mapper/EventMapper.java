@@ -8,6 +8,8 @@ import com.example.campuspulseai.southbound.entity.Event;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
@@ -25,6 +27,8 @@ public interface EventMapper {
 
     @Mapping(target = "startTime", source = "event.timeDate")
     GetEventResponse mapToEventResponseDetails(Event event);
+
+    List<GetEventResponse> mapToEventResponseDetailsList(List<Event> events);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "timeDate", source = "startTime")

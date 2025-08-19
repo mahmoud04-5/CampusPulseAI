@@ -6,6 +6,7 @@ import com.example.campuspulseai.service.ISurveyService;
 import com.example.campuspulseai.southbound.entity.SurveyQuestion;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
+import com.example.campuspulseai.southbound.mapper.SurveyQuestionMapper;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyUserAnswersRepository;
@@ -17,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,26 +32,22 @@ public class SurveyServiceImpl implements ISurveyService {
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
     private final IQuestionChoicesRepository questionChoicesRepository;
     private final AuthUtils authUtils;
+    private final SurveyQuestionMapper surveyQuestionMapper;
+
 
 
     @Override
     @Transactional
     public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
-        try {
-            User user = authUtils.getAuthenticatedUser();
-            SurveyUserAnswers userAnswers = buildSurveyUserAnswers(user, surveyResponses);
-            saveSurveyResponse(userAnswers);
-        } catch (AccessDeniedException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-        }
+        User user = authUtils.getAuthenticatedUser();
+        SurveyUserAnswers userAnswers = buildSurveyUserAnswers(user, surveyResponses);
+        saveSurveyResponse(userAnswers);
     }
 
     @Override
     public List<SurveyQuestionDTO> getAllSurveyQuestions() {
         List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
-        return surveyQuestions.stream()
-                .map(this::mapToSurveyQuestionDTO)
-                .toList();
+        return surveyQuestionMapper.toDtoList(surveyQuestions); // MapStruct handles the list
     }
 
     // ---------- Helper methods ----------
@@ -100,12 +96,4 @@ public class SurveyServiceImpl implements ISurveyService {
         surveyUserAnswersRepository.save(userAnswers);
     }
 
-    private SurveyQuestionDTO mapToSurveyQuestionDTO(SurveyQuestion surveyQuestion) {
-        return new SurveyQuestionDTO(
-                surveyQuestion.getId(),
-                surveyQuestion.getQuestion(),
-                surveyQuestion.getChoices(),
-                List.of()
-        );
-    }
 }

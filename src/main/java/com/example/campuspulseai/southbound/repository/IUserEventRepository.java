@@ -9,5 +9,5 @@ import java.util.List;
 public interface IUserEventRepository extends JpaRepository<UserEvent, UserEventId> {
     List<UserEvent> findByUserId(Long id);
 
-    List<UserEvent> findByEventId(UserEventId id);
+    List<UserEvent> findByEventId(Long id);
 }

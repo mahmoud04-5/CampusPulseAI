@@ -2,15 +2,16 @@ package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.service.IClubRecommendationService;
-import com.example.campuspulseai.service.ISurveyService;
 import com.example.campuspulseai.southbound.entity.*;
 
 import com.example.campuspulseai.southbound.mapper.ClubMapper;
+import com.example.campuspulseai.southbound.mapper.UserClubMapper;
 import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.IUserRecommendedClubRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
     private final IQuestionChoicesRepository questionChoicesRepository;
     private final IUserRecommendedClubRepository userRecommendedClubRepository;
     private final ClubMapper clubMapper;
+    private final UserClubMapper userClubMapper;
 
     @Override
     public List<GetClubResponse> getRecommendationsForUser(Long userId) {
@@ -55,10 +57,12 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
 
     // ---------- Helper methods ----------
 
+
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
     }
+
 
     private boolean hasNoSurveyAnswers(List<SurveyUserAnswers> surveyUserAnswers) {
         return surveyUserAnswers == null || surveyUserAnswers.isEmpty();
@@ -95,21 +99,18 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
                 .toList();
     }
 
+
+
     private void saveUserRecommendations(User user, List<Club> clubs) {
         List<SuggestedUserClubs> savedRecs = clubs.stream()
-                .map(club -> SuggestedUserClubs.builder()
-                        .user(user)
-                        .club(club)
-                        .build())
+                .map(club -> userClubMapper.toSuggestedUserClubs(user, club))
                 .toList();
 
         userRecommendedClubRepository.saveAll(savedRecs);
     }
 
     private List<GetClubResponse> mapClubsToDto(List<Club> clubs) {
-        return clubs.stream()
-                .map(clubMapper::toDto)
-                .toList();
+        return clubMapper.toDtoList(clubs);
     }
 
     // ---------- Existing survey extraction logic ----------

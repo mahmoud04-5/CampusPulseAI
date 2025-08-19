@@ -1,13 +1,22 @@
 package com.example.campuspulseai.service.Impl;
 
+import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.UserMapper;
 import com.example.campuspulseai.southbound.repository.*;
+import lombok.SneakyThrows;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+
+
+
 
 import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.specification.impl.EventSpecifications;
@@ -16,8 +25,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -30,25 +39,35 @@ public class EventServiceImpl implements IEventService {
 
     private final IAuthUtils authUtils;
     private final IEventRepository eventRepository;
-    private final IUserRepository userRepository;
     private final IUserEventRepository userEventRepository;
     private final IClubRepository clubRepository;
     private final EventMapper eventMapper;
     private final EventSpecifications eventSpecifications;
+    private final UserMapper userMapper;
 
+    @SneakyThrows
     @Override
-    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) throws AccessDeniedException {
+    public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
         User user = authUtils.getAuthenticatedUser();
         Event event = eventMapper.mapToEvent(createEventRequest);
-        Club club = clubRepository.findByOwnerId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Club not found for user"));
+
+        Club club = getClubByOwnerId(user.getId());
         event.setClub(club);
+
         Event createdEvent = eventRepository.save(event);
         return eventMapper.mapToCreateEventResponse(createdEvent);
     }
 
+
+    private Club getClubByOwnerId(Long ownerId) {
+        return clubRepository.findByOwnerId(ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Club not found for user with id: " + ownerId));
+    }
+
+
+    @SneakyThrows
     @Override
-    public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) throws AccessDeniedException {
+    public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) {
         Event event = getEventFromDBById(id);
         Club club = clubRepository.getById(event.getClub().getId());
         User user = authUtils.getAuthenticatedUser();
@@ -65,8 +84,9 @@ public class EventServiceImpl implements IEventService {
         return eventMapper.mapToCreateEventResponse(event);
     }
 
+    @SneakyThrows
     @Override
-    public void deleteEventById(Long id) throws AccessDeniedException {
+    public void deleteEventById(Long id) {
         Event event = getEventFromDBById(id);
         Club club = clubRepository.getById(event.getClub().getId());
         User user = authUtils.getAuthenticatedUser();
@@ -83,10 +103,12 @@ public class EventServiceImpl implements IEventService {
                 .and(eventSpecifications.hasEventDate(eventDateTime));
 
         Pageable pageable = PageRequest.of(page, size);
-        return eventRepository.findAll(spec, pageable).stream()
-                .map(eventMapper::mapToEventResponseDetails)
-                .toList();
+
+        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
+
+        return eventMapper.mapToEventResponseDetailsList(events);
     }
+
 
     @Override
     public List<GetEventResponse> suggestEventsToAttend() {
@@ -103,59 +125,69 @@ public class EventServiceImpl implements IEventService {
         return List.of();
     }
 
+    @SneakyThrows
     @Override
     public List<GetEventResponse> getAllEventsForCurrentUser() {
-        User dummyUser = getDummyUser();
-        List<UserEvent> userEvents = userEventRepository.findByUserId(dummyUser.getId());
+        User user = authUtils.getAuthenticatedUser();
+        List<UserEvent> userEvents = userEventRepository.findByUserId(user.getId());
 
         return userEvents.stream()
                 .map(userEvent -> {
-                    Event event = eventRepository.findById(userEvent.getEventId())
-                            .orElseThrow(() -> new RuntimeException("Event not found with id: " + userEvent.getEventId()));
+                    Event event = getEventFromDBById(userEvent.getEventId());
                     return eventMapper.mapToEventResponseDetails(event);
                 })
                 .toList();
     }
 
 
+    @SneakyThrows
     @Override
     public void attendEvent(Long eventId) {
-        User dummyUser = getDummyUser();
+        User user = authUtils.getAuthenticatedUser();
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
 
         UserEvent userEvent = new UserEvent();
-        userEvent.setUserId(dummyUser.getId());
+        userEvent.setUserId(user.getId());
         userEvent.setEventId(eventId);
-        userEvent.setUser(dummyUser);
+        userEvent.setUser(user);
         userEvent.setEvent(event);
         userEvent.setRsvpDateTime(LocalDateTime.now());
         userEventRepository.save(userEvent);
     }
 
+    @SneakyThrows
     @Override
     public void unattendEvent(Long eventId) {
-        User dummyUser = getDummyUser();
-        UserEventId id = new UserEventId(dummyUser.getId(), eventId);
+        User user = authUtils.getAuthenticatedUser();
+        UserEventId id = new UserEventId(user.getId(), eventId);
         userEventRepository.deleteById(id);
     }
 
     @Override
-    public List<GetEventResponse> getAttendeesByEventId(Long eventId) {
-        return List.of();
+    public List<GetUserResponse> getAttendeesByEventId(Long eventId) {
+        List<UserEvent> userEvents = userEventRepository.findByEventId(eventId);
+
+        return userEvents.stream()
+                .map(UserEvent::getUser)
+                .filter(Objects::nonNull)
+                .map(userMapper::mapToUserResponse)
+                .filter(Objects::nonNull)
+                .toList();
     }
+
 
     @Override
     public List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki"));
-        LocalDateTime filterDate = (startDate != null) ? startDate : now.toLocalDateTime();
+        LocalDateTime filterDate = (startDate != null)
+                ? startDate
+                : LocalDateTime.now(ZoneId.of("Europe/Helsinki"));
 
         List<Event> events = (category != null && !category.isEmpty())
                 ? eventRepository.findByTimeDateAfterAndCategory(filterDate, category)
                 : eventRepository.findByTimeDateAfter(filterDate);
 
         return events.stream()
-                .filter(e -> e.getStartDate() != null && e.getStartDate().isAfter(filterDate))
                 .map(eventMapper::mapToEventResponseDetails)
                 .toList();
 
@@ -169,27 +201,26 @@ public class EventServiceImpl implements IEventService {
     }
 
 
-    @Override
-    public User getDummyUser() {
-        return userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Dummy user not found"));
-    }
+
 
     // Helper
     private Event getEventFromDBById(Long id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
     }
 
     private void validateUserClubOwnership(User user, Club club) {
         if (!Objects.equals(club.getOwner().getId(), user.getId())) {
-            throw new RuntimeException("User does not own this club");
+            throw new AccessDeniedException("User does not own this club");
         }
     }
 
     private void validateEventTime(Event event) {
         if (event.getStartDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Event start time cannot be in the past");
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Event start time cannot be in the past"
+            );
         }
     }
 }

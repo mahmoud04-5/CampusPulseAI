@@ -8,8 +8,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class GetClubResponse {
-
-    // Core Club Information
     private Long clubId;
     private String name;
     private String description;
