@@ -18,4 +18,5 @@ public class AuthUtils implements IAuthUtils {
         }
         return (User) authentication.getPrincipal();
     }
+
 }

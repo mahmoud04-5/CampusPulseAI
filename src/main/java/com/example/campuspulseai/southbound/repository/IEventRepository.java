@@ -15,4 +15,7 @@ public interface IEventRepository extends JpaRepository<Event, Long>, JpaSpecifi
 
     Optional<Event> findByIdAndIsActiveTrue(Long id);
 
+    List<Event> findByClubId(Long clubId);
+
+
 }
