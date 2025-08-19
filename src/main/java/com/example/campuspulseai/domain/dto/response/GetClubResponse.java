@@ -11,4 +11,6 @@ public class GetClubResponse {
     private String description;
     private String logoUrl;
     private Boolean isActive;
+    private OrganizerResponse organizerResponse;
+    private List<GetEventResponse> events;
 }
