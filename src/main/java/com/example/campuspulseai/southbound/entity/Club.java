@@ -43,11 +43,5 @@ public class Club {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
-    public Club(String name, String description, String logoUrl, User owner) {
-        this.name = name;
-        this.description = description;
-        this.logoUrl = logoUrl;
-        this.owner = owner;
-    }
 }
 

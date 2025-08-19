@@ -65,7 +65,6 @@ public class ClubServiceImpl implements IClubService {
     public CreateClubResponse updateClub(Long id, CreateClubRequest updateClubRequest) throws AccessDeniedException {
         User currentUser = authUtils.getAuthenticatedUser();
         Club club = findClubByIdOrThrow(id);
-        List<GetEventResponse> events = eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()));
         validateClubOwnership(club, currentUser);
         clubMapper.updateClubFromRequest(updateClubRequest, club);
         Club updatedClub = clubRepository.save(club);

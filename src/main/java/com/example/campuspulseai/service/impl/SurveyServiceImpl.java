@@ -28,13 +28,13 @@ public class SurveyServiceImpl implements ISurveyService {
     }
 
     @Override
-    public void submitSurveyResponse(List<SurveyQuestionDTO> surveyresponses) {
+    public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
         User user = getAuthenticatedUser();
-        surveyresponses.forEach(surveyQuestiondto -> {
-            if (surveyQuestiondto.getChoices() == null || surveyQuestiondto.getChoices().isEmpty()) {
+        surveyResponses.forEach(surveyQuestionDTO -> {
+            if (surveyQuestionDTO.getChoices() == null || surveyQuestionDTO.getChoices().isEmpty()) {
                 throw new IllegalArgumentException("Survey answer cannot be null or empty");
             } else {
-                surveyQuestiondto.getSelectedChoicesIds().forEach(choiceId -> {
+                surveyQuestionDTO.getSelectedChoicesIds().forEach(choiceId -> {
                     SurveyUserAnswers surveyUserAnswers = new SurveyUserAnswers();
                     surveyUserAnswers.setUser(user); //sets the user field of the SurveyUserAnswers object to the authenticated User retrieved earlier.
                     //surveyUserAnswers.setSurveyQuestion(surveyQuestionRepository.findById(surveyQuestiondto.getQuestionId())
