@@ -1,10 +1,7 @@
 package com.example.campuspulseai.domain.dto.request;
 
 import com.example.campuspulseai.common.validation.ValidCategoryNullable;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +31,9 @@ public class EditEventRequest {
     @ValidCategoryNullable
     private String category;
 
+    @Pattern(
+            regexp = "^https://res\\.cloudinary\\.com/dct8rg7di.*$",
+            message = "Logo URL must be a valid Cloudinary URL"
+    )
     private String imageUrl;
 }

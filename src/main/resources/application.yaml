@@ -25,8 +25,17 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 springdoc:
   swagger-ui:
     path: /docs
 
+cloudinary:
+  cloud_name: dct8rg7di
+  api_key: 614467574267491
+  api_secret: OqeWh56aS8q9ncVhmNB4enxNk4k
 

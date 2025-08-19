@@ -33,6 +33,9 @@ public class CreateEventRequest {
     @NotNull(message = "Event category is required")
     private String category;
 
-
+    @Pattern(
+            regexp = "^https://res\\.cloudinary\\.com/dct8rg7di.*$",
+            message = "Logo URL must be a valid Cloudinary URL"
+    )
     private String imageUrl;
 }
