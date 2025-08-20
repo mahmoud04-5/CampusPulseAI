@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.Impl;
+package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
@@ -29,7 +29,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 

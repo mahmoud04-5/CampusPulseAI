@@ -1,7 +1,7 @@
 package com.example.campuspulseai.northbound.controller;
 
+
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
-import com.example.campuspulseai.southbound.entity.Club;
 import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import java.nio.file.AccessDeniedException;
+
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
@@ -30,7 +32,7 @@ public class ClubController {
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    CreateClubResponse createClub(@Valid @RequestBody CreateClubRequest createClubRequest) {
+    CreateClubResponse createClub(@Valid @RequestBody CreateClubRequest createClubRequest) throws AccessDeniedException {
         return clubService.createClub(createClubRequest);
     }
 
@@ -42,13 +44,20 @@ public class ClubController {
     }
 
 
+    @Operation(summary = "Update club by ID", description = "Updates an existing club's information.")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    CreateClubResponse updateClub(@PathVariable Long id,@Valid @RequestBody CreateClubRequest updateClubRequest) throws AccessDeniedException {
+        return clubService.updateClub(id, updateClubRequest);
+    }
+
+
     @Operation(summary = "Delete club by ID", description = "Deletes a club by its ID.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteClubById(@PathVariable Long id) {
+    void deleteClubById(@PathVariable Long id) throws AccessDeniedException {
         clubService.deleteClubById(id);
     }
-
 
     @Operation(summary = "Get clubs / search clubs",
             description = "Retrieves a paginated list of clubs. Optionally filters by a search query.")
@@ -67,8 +76,7 @@ public class ClubController {
     )
     @GetMapping("/recommendations/{userId}")
     public ResponseEntity<List<GetClubResponse>> getRecommendationsForUser(@PathVariable Long userId) {
-        List<GetClubResponse> recommendations = clubRecommendationService.getRecommendationsForUser(userId);
-        return ResponseEntity.ok(recommendations);
+        return ResponseEntity.ok(clubRecommendationService.getRecommendationsForUser(userId));
     }
 
 

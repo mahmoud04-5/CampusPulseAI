@@ -6,34 +6,38 @@ import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.Event;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
+    // ✅ Remove INSTANCE (Spring will inject the bean)
+    // EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 
+    // Create Event -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "timeDate", source = "request.startTime")
-    Event mapToClub(CreateEventRequest request);
+    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
+    Event mapToEvent(CreateEventRequest request);
 
-    @Mapping(target = "eventId", source = "event.id")
+    // Entity -> CreateEventResponse
+    @Mapping(target = "eventId", source = "id")
     CreateEventResponse mapToCreateEventResponse(Event event);
 
-    @Mapping(target = "startTime", source = "event.timeDate")
+    // Entity -> GetEventResponse
+    @Mapping(target = "startTime", source = "timeDate")
     GetEventResponse mapToEventResponseDetails(Event event);
 
+    // List<Entity> -> List<GetEventResponse>
     List<GetEventResponse> mapToEventResponseDetailsList(List<Event> events);
 
+    // Edit Event -> Update Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "timeDate", source = "startTime")
-        // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 
-    Event mapToEvent(CreateEventRequest createEventRequest);
+    List<GetEventResponse> toGetEventResponseList(List<Event> byClubId);
 }

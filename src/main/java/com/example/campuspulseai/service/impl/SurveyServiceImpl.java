@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.Impl;
+package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.util.AuthUtils;
 import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
@@ -10,7 +10,6 @@ import com.example.campuspulseai.southbound.mapper.SurveyQuestionMapper;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyUserAnswersRepository;
-import com.example.campuspulseai.southbound.repository.IUserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +25,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class SurveyServiceImpl implements ISurveyService {
-
-    private final IUserRepository userRepository;
     private final ISurveyQuestionRepository surveyQuestionRepository;
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
     private final IQuestionChoicesRepository questionChoicesRepository;
