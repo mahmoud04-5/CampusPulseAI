@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,10 +132,9 @@ public class EventServiceImpl implements IEventService {
         List<UserEvent> userEvents = userEventRepository.findByUserId(user.getId());
 
         return userEvents.stream()
-                .map(userEvent -> {
-                    Event event = getEventFromDBById(userEvent.getEventId());
-                    return eventMapper.mapToEventResponseDetails(event);
-                })
+                .map(UserEvent::getEvent)
+                .filter(Objects::nonNull)
+                .map(event -> eventMapper.mapToEventResponseDetails(event, true))
                 .toList();
     }
 
@@ -152,6 +152,7 @@ public class EventServiceImpl implements IEventService {
         userEvent.setUser(user);
         userEvent.setEvent(event);
         userEvent.setRsvpDateTime(LocalDateTime.now());
+        event.setTotalAttendees(event.getTotalAttendees() + 1);
         userEventRepository.save(userEvent);
     }
 
@@ -159,8 +160,11 @@ public class EventServiceImpl implements IEventService {
     @Override
     public void unattendEvent(Long eventId) {
         User user = authUtils.getAuthenticatedUser();
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
         UserEventId id = new UserEventId(user.getId(), eventId);
         userEventRepository.deleteById(id);
+        event.setTotalAttendees(event.getTotalAttendees() - 1);
     }
 
     @Override
@@ -176,6 +180,7 @@ public class EventServiceImpl implements IEventService {
     }
 
 
+    @SneakyThrows
     @Override
     public List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category) {
         LocalDateTime filterDate = (startDate != null)
@@ -186,17 +191,24 @@ public class EventServiceImpl implements IEventService {
                 ? eventRepository.findByTimeDateAfterAndCategory(filterDate, category)
                 : eventRepository.findByTimeDateAfter(filterDate);
 
-        return events.stream()
-                .map(eventMapper::mapToEventResponseDetails)
-                .toList();
+        User user = authUtils.getAuthenticatedUser();
 
+        return events.stream()
+                .map(event -> {
+                    boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), event.getId()));
+                    return eventMapper.mapToEventResponseDetails(event, isUserAttending);
+                })
+                .collect(Collectors.toList());
     }
 
 
+    @SneakyThrows
     @Override
     public GetEventResponse getEventDetails(Long id) {
         Event event = getEventFromDBById(id);
-        return eventMapper.mapToEventResponseDetails(event);
+        User user = authUtils.getAuthenticatedUser();
+        boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), id));
+        return eventMapper.mapToEventResponseDetails(event, isUserAttending);
     }
 
 

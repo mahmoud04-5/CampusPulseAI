@@ -4,9 +4,6 @@ import lombok.*;
 
 import java.util.List;
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class GetClubResponse {
     private Long clubId;
     private String name;

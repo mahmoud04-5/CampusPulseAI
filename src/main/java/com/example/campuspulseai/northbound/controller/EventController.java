@@ -17,9 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Tag(name = "Event endpoints", description = "Endpoints for event operations")
@@ -79,7 +77,6 @@ public class EventController {
     @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> suggestEventsToAttend() {
-        // Logic to suggest events based on interests
         return eventService.suggestEventsToAttend();
     }
 
@@ -112,17 +109,8 @@ public class EventController {
     @DeleteMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> unattendEvent(@PathVariable Long eventId) {
-        try {
-            eventService.unattendEvent(eventId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("Event not found")) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } else if (e.getMessage().contains("not attending")) { // Add custom logic if needed
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        eventService.unattendEvent(eventId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")

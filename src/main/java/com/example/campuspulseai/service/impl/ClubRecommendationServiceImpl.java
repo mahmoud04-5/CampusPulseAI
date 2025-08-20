@@ -156,7 +156,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
     }
 
     private List<GetClubResponse> mapClubsToDto(List<Club> clubs) {
-        return clubMapper.toDtoList(clubs);
+        return clubMapper.toGetClubResponse(clubs);
     }
 
     // ---------- Existing survey extraction logic ----------

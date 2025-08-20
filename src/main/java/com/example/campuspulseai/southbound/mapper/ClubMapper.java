@@ -18,7 +18,7 @@ import java.util.List;
 public interface ClubMapper {
     @Mapping(source = "id", target = "clubId")
     GetClubResponse toDto(Club club);
-    List<GetClubResponse> toDtoList(List<Club> clubs);
+    List<GetClubResponse> toGetClubResponse (List<Club> clubs);
 
     ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
 

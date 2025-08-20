@@ -44,7 +44,7 @@ public class SurveyServiceImpl implements ISurveyService {
     @Override
     public List<SurveyQuestionDTO> getAllSurveyQuestions() {
         List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
-        return surveyQuestionMapper.toDtoList(surveyQuestions); // MapStruct handles the list
+        return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions); // MapStruct handles the list
     }
 
     // ---------- Helper methods ----------
