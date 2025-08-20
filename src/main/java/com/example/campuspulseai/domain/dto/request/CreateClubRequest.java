@@ -1,6 +1,6 @@
 package com.example.campuspulseai.domain.dto.request;
 
-import jakarta.validation.constraints.Pattern;
+import com.example.campuspulseai.common.validation.ValidCloudinaryPath;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,7 @@ public class CreateClubRequest {
     private String clubDescription;
 
 
-    @Pattern(
-            regexp = "^https://res\\.cloudinary\\.com/dct8rg7di.*$",
-            message = "Logo URL must be a valid Cloudinary URL"
-    )
+    @ValidCloudinaryPath
     private String logoUrl;
 
 }

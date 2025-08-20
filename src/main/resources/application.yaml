@@ -38,4 +38,5 @@ cloudinary:
   cloud_name: dct8rg7di
   api_key: 614467574267491
   api_secret: OqeWh56aS8q9ncVhmNB4enxNk4k
+  url_pattern: ^https://res\.cloudinary\.com/dct8rg7di.*$
 
