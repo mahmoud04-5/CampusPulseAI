@@ -2,7 +2,6 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
-import com.example.campuspulseai.service.IAiService;
 import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.southbound.entity.Event;
 import com.example.campuspulseai.southbound.entity.QuestionChoices;
@@ -27,7 +26,7 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
     private final ISurveyQuestionRepository surveyQuestionRepository;
     private final IQuestionChoicesRepository questionChoicesRepository;
-    private final IAiService aiService;
+    private final AIService aiService;
     private final IEventRepository eventRepository;
     private final IEventSpecifications eventSpecifications;
 
@@ -82,7 +81,7 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         for (SurveyQuestion q : questions) {
             promptBuilder.append("{")
                     .append("\"id\": ").append(q.getId()).append(", ")
-                    .append("\"question\": \"").append(q.getQuestionText()).append("\"")
+                    .append("\"question\": \"").append(q.getQuestion()).append("\"")
                     .append(", \"choices\": [");
             choices.stream()
                     .filter(c -> c.getQuestion().getId().equals(q.getId()))
