@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: CampusPulseAi
+  profiles:
+    active: local
   ai:
     openai:
       api-key: ${OPEN_AI_KEY}
