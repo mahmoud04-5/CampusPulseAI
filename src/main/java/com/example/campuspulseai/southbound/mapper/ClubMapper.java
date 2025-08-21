@@ -14,8 +14,11 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {EventMapper.class})
+@Mapper(componentModel = "spring")
 public interface ClubMapper {
+    @Mapping(source = "id", target = "clubId")
+    GetClubResponse toDto(Club club);
+    List<GetClubResponse> toGetClubResponse (List<Club> clubs);
 
     ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
 
@@ -31,8 +34,8 @@ public interface ClubMapper {
 
     void updateClubFromRequest(CreateClubRequest request, @MappingTarget Club club);
 
-    @Mapping(source = "request.clubName", target = "name")   // 👈 Fix
-    @Mapping(source = "request.clubDescription", target = "description") // 👈 Fix
+    @Mapping(source = "request.clubName", target = "clubName")
+    @Mapping(source = "request.clubDescription", target = "description")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")
     Club toClub(CreateClubRequest request, User user);

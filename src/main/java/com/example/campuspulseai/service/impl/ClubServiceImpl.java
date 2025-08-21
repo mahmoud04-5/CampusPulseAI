@@ -5,10 +5,8 @@ import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
-import com.example.campuspulseai.domain.dto.response.OrganizerResponse;
 import com.example.campuspulseai.service.IClubService;
 import com.example.campuspulseai.southbound.entity.Club;
-import com.example.campuspulseai.southbound.entity.Event;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.mapper.ClubMapper;
 import com.example.campuspulseai.southbound.mapper.EventMapper;
@@ -25,9 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor

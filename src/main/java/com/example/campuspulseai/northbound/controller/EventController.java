@@ -4,6 +4,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,9 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Tag(name = "Event endpoints", description = "Endpoints for event operations")
@@ -78,7 +77,6 @@ public class EventController {
     @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> suggestEventsToAttend() {
-        // Logic to suggest events based on interests
         return eventService.suggestEventsToAttend();
     }
 
@@ -103,50 +101,33 @@ public class EventController {
     @PostMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> attendEvent(@PathVariable Long eventId) {
-
         eventService.attendEvent(eventId);
         return new ResponseEntity<>(HttpStatus.OK);
-
-
     }
 
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
     @DeleteMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> unattendEvent(@PathVariable Long eventId) {
-        try {
-            eventService.unattendEvent(eventId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("Event not found")) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } else if (e.getMessage().contains("not attending")) { // Add custom logic if needed
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        eventService.unattendEvent(eventId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")
     @GetMapping("/{eventId}/attendees")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> getAttendeesByEventId(@PathVariable Long eventId) {
-        // Logic to get attendees of an event by event ID
+    public List<GetUserResponse> getAttendeesByEventId(@PathVariable Long eventId) {
         return eventService.getAttendeesByEventId(eventId);
     }
 
+
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")
-    public ResponseEntity<Map<String, Object>> getEvents(
+    public ResponseEntity<List<GetEventResponse>> getEvents(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
             @RequestParam(required = false) String category) {
-        List<GetEventResponse> upcomingEvents = eventService.getUpcomingEvents(dateTime, category);
-        Map<String, Object> response = new HashMap<>();
-        response.put("upcomingEvents", upcomingEvents);
-        response.put("message", upcomingEvents.isEmpty() ? "No upcoming events found" : "Upcoming events found");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(eventService.getUpcomingEvents(dateTime, category));
     }
-
 
 }
 

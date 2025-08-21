@@ -61,6 +61,9 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<UserEvent> attendees = new ArrayList<>();
 
+    @Column(name = "totalattendees", nullable = false)
+    private Integer totalAttendees = 0;
+
     // Custom getter for isActive to follow JavaBean convention
     public boolean isActive() {
         return isActive;
