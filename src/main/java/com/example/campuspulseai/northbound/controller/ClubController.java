@@ -2,6 +2,7 @@ package com.example.campuspulseai.northbound.controller;
 
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
+import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.service.IClubRecommendationService;
@@ -70,10 +71,14 @@ public class ClubController {
         return clubService.getClubs(query, page, size);
     }
 
-    @Operation(summary = "Get Club Recommendations", description = "Retrieves personalized club recommendations for a user based on their survey responses.")
+    @Operation(
+            summary = "Get Club Recommendations",
+            description = "Retrieves personalized club recommendations for a user based on their survey responses."
+    )
     @GetMapping("/recommendations/{userId}")
-    public ResponseEntity<List<Club>> getRecommendationsForUser(@PathVariable Long userId) {
-        List<Club> recommendations = clubRecommendationService.getRecommendationsForUser(userId);
-        return recommendations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(recommendations);
+    public ResponseEntity<List<GetClubResponse>> getRecommendationsForUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(clubRecommendationService.getRecommendationsForUser(userId));
     }
+
+
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.function.Function;
 
 @Entity
 @Table(name = "questions_choices")
@@ -33,4 +34,5 @@ public class QuestionChoices {
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
+
 }

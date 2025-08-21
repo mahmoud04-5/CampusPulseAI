@@ -4,7 +4,8 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
-import com.example.campuspulseai.southbound.entity.User;
+import com.example.campuspulseai.domain.dto.response.GetUserResponse;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,13 +35,11 @@ public interface IEventService {
 
     void unattendEvent(Long eventId);
 
-    List<GetEventResponse> getAttendeesByEventId(Long eventId);
+    List<GetUserResponse> getAttendeesByEventId(Long eventId);
+
 
     List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category);
 
     GetEventResponse getEventDetails(Long id);
 
-    User getCurrentUser();
-
-    User getDummyUser();
 }

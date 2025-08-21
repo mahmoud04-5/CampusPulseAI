@@ -1,19 +1,21 @@
 package com.example.campuspulseai.service.impl;
 
+import com.example.campuspulseai.common.util.AuthUtils;
 import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
 import com.example.campuspulseai.service.ISurveyService;
-import com.example.campuspulseai.southbound.entity.QuestionChoices;
 import com.example.campuspulseai.southbound.entity.SurveyQuestion;
-import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
 import com.example.campuspulseai.southbound.entity.User;
+import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
+import com.example.campuspulseai.southbound.mapper.SurveyQuestionMapper;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyUserAnswersRepository;
-import com.example.campuspulseai.southbound.repository.IUserRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,49 +25,67 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class SurveyServiceImpl implements ISurveyService {
-    private final IUserRepository userRepository;
     private final ISurveyQuestionRepository surveyQuestionRepository;
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
     private final IQuestionChoicesRepository questionChoicesRepository;
+    private final AuthUtils authUtils;
+    private final SurveyQuestionMapper surveyQuestionMapper;
+
 
 
     @Override
     @Transactional
     public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
-        //User user = getAuthenticatedUser();
-        User user = getDummyUser();
-        SurveyUserAnswers userAnswers = prepareSurveyResponse(user, surveyResponses);
+        User user = authUtils.getAuthenticatedUser();
+        SurveyUserAnswers userAnswers = buildSurveyUserAnswers(user, surveyResponses);
         saveSurveyResponse(userAnswers);
     }
 
-    private SurveyUserAnswers prepareSurveyResponse(User user, List<SurveyQuestionDTO> surveyResponses) {
+    @Override
+    public List<SurveyQuestionDTO> getAllSurveyQuestions() {
+        List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
+        return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions); // MapStruct handles the list
+    }
+
+    // ---------- Helper methods ----------
+
+
+    private SurveyUserAnswers buildSurveyUserAnswers(User user, List<SurveyQuestionDTO> surveyResponses) {
         if (surveyResponses == null || surveyResponses.isEmpty()) {
-            throw new IllegalArgumentException("Survey responses cannot be null or empty");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Survey responses cannot be null or empty");
         }
 
-        // Check for existing response and update if needed
         SurveyUserAnswers userAnswers = surveyUserAnswersRepository.findByUserId(user.getId())
                 .orElse(new SurveyUserAnswers());
         userAnswers.setUser(user);
 
         Map<String, Object> questionAnswers = Optional.ofNullable(userAnswers.getQuestionAnswers())
                 .orElse(new HashMap<>());
+
         for (SurveyQuestionDTO response : surveyResponses) {
-            if (response.getSelectedChoicesIds() == null || response.getSelectedChoicesIds().isEmpty()) {
-                throw new IllegalArgumentException("Selected choices for question " + response.getQuestionId() + " cannot be null or empty");
-            }
-            // Validate question and choices existence
-            surveyQuestionRepository.findById(response.getQuestionId())
-                    .orElseThrow(() -> new IllegalArgumentException("Question " + response.getQuestionId() + " not found"));
-            response.getSelectedChoicesIds().forEach(choiceId ->
-                    questionChoicesRepository.findById(choiceId)
-                            .orElseThrow(() -> new IllegalArgumentException("Choice " + choiceId + " not found"))
-            );
+            validateSurveyResponse(response);
             questionAnswers.put(String.valueOf(response.getQuestionId()), response.getSelectedChoicesIds());
         }
-        userAnswers.setQuestionAnswers(questionAnswers);
 
+        userAnswers.setQuestionAnswers(questionAnswers);
         return userAnswers;
+    }
+
+    private void validateSurveyResponse(SurveyQuestionDTO response) {
+        if (response.getSelectedChoicesIds() == null || response.getSelectedChoicesIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Selected choices for question " + response.getQuestionId() + " cannot be null or empty");
+        }
+
+        surveyQuestionRepository.findById(response.getQuestionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                        "Question " + response.getQuestionId() + " not found"));
+
+        response.getSelectedChoicesIds().forEach(choiceId ->
+                questionChoicesRepository.findById(choiceId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                                "Choice " + choiceId + " not found"))
+        );
     }
 
     @Transactional
@@ -73,42 +93,4 @@ public class SurveyServiceImpl implements ISurveyService {
         surveyUserAnswersRepository.save(userAnswers);
     }
 
-    @Override
-    public boolean isSurveyCompleted() {
-        User user = getAuthenticatedUser();
-        return surveyUserAnswersRepository.findByUserId(user.getId()).isPresent();
-    }
-
-
-    @Override
-    public User getAuthenticatedUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
-    }
-
-
-    public User getDummyUser() {
-        return userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Dummy user not found"));
-    }
-
-    @Override
-    public List<SurveyQuestionDTO> getAllSurveyQuestions() {
-        List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
-        return surveyQuestions.stream()
-                .map(surveyQuestion -> {
-                    List<Long> choiceIds = surveyQuestion.getChoices() != null
-                            ? surveyQuestion.getChoices().stream()
-                            .map(QuestionChoices::getId)
-                            .toList()
-                            : List.of();
-                    return new SurveyQuestionDTO(
-                            surveyQuestion.getId(),
-                            surveyQuestion.getQuestionText(),
-                            choiceIds
-                    );
-                })
-                .toList();
-    }
 }

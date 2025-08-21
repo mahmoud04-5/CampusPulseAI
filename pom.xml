@@ -19,7 +19,7 @@
     <name>CampusPulseAi</name>
     <description>CampusPulseAi</description>
 
-    <!-- Properties -->
+    <!-- Project Properties -->
     <properties>
         <java.version>21</java.version>
         <postgresql.version>42.7.7</postgresql.version>
@@ -34,7 +34,7 @@
 
     <!-- Dependencies -->
     <dependencies>
-        <!-- Core Spring Boot -->
+        <!-- Core Spring Boot Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -56,12 +56,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Dev tools -->
+        <!-- Development Tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -69,7 +70,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Database -->
+        <!-- Database and Migration -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -80,7 +81,7 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
 
-        <!-- Lombok + MapStruct -->
+        <!-- Utilities -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -105,14 +106,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- SpringDoc OpenAPI -->
+        <!-- API Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- JWT -->
+        <!-- Authentication (JWT) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -149,12 +150,12 @@
         <dependencies>
             <!-- Optional AI BOM (commented out for now)!-->
             <dependency>
-              <groupId>org.springframework.ai</groupId>
-               <artifactId>spring-ai-bom</artifactId>
-               <version>${spring-ai.version}</version>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
-            <scope>import</scope>
-           </dependency>
+                <scope>import</scope>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -192,7 +193,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Liquibase -->
+            <!-- Liquibase Plugin -->
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
@@ -224,4 +225,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
