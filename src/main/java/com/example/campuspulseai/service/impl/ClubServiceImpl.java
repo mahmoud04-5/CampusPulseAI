@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -43,9 +44,10 @@ public class ClubServiceImpl implements IClubService {
     @Override
     public CreateClubResponse createClub(CreateClubRequest createClubRequest) throws AccessDeniedException {
         User user = authUtils.getAuthenticatedUser();
+        validateFirstClubCreation(user);
         Club club = clubMapper.toClub(createClubRequest, user);
         Club savedClub = clubRepository.save(club);
-        user.setGroup(new Group(1L, "GROUP_ORGANIZERS", null));
+        user.setGroup(new Group(2L, "GROUP_ORGANIZERS", null));
         userRepository.save(user);
         return clubMapper.toCreateClubResponse(savedClub);
     }
@@ -103,6 +105,13 @@ public class ClubServiceImpl implements IClubService {
                 club,
                 eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()))
         ));
+    }
+
+    private void validateFirstClubCreation(User user) throws ResponseStatusException {
+        Optional<Club> oldClub = clubRepository.findByOwnerId(user.getId());
+        if (oldClub.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "You already own a club");
+        }
     }
 
 }
