@@ -13,7 +13,7 @@ spring:
     expiration: 86400000 # 1 day in ms
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
+    url: jdbc:postgresql://10.0.10.7:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
     username: postgres
     password: qeema**123 #postgres
     driver-class-name: org.postgresql.Driver
@@ -30,7 +30,8 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
-
+  profiles:
+    active: local
 springdoc:
   swagger-ui:
     path: /docs
