@@ -30,8 +30,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
-  profiles:
-    active: local
+
 springdoc:
   swagger-ui:
     path: /docs
