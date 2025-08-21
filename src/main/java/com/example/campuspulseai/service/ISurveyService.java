@@ -10,7 +10,5 @@ public interface ISurveyService {
 
     void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses);
 
-    boolean isSurveyCompleted();
 
-    User getAuthenticatedUser();
 }

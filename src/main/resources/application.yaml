@@ -4,6 +4,10 @@ spring:
   application:
     name: CampusPulseAi
 
+  ai:
+    openai:
+      api-key: ${OPEN_AI_KEY}
+
   jwt:
     secret: 784478f2757b1596b7b5013f61a5302401d077e21bed3a51558d423e02381c83
     expiration: 86400000 # 1 day in ms

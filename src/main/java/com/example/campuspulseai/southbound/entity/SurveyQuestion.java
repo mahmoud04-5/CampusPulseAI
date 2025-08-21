@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -23,9 +24,9 @@ public class SurveyQuestion {
     @Column(columnDefinition = "TEXT")
     private String question;
 
-    private String category;
 
 
+    @Column(name = "allow_mulltiple_answers", nullable = false)
     private Boolean allowMultipleAnswers = false;
 
     @OneToMany(mappedBy = "question",

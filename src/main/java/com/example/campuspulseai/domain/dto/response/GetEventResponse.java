@@ -1,6 +1,5 @@
 package com.example.campuspulseai.domain.dto.response;
 
-import com.example.campuspulseai.southbound.entity.Club;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 public class GetEventResponse {
     private Long id;
     private String title;
@@ -24,26 +23,6 @@ public class GetEventResponse {
     private String eventCategory;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
-
-    public GetEventResponse(long id, String title, String description, LocalDateTime timeDate) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.startTime = timeDate;
-    }
-
-
-    public GetEventResponse(long id, String title, Club club, String description, LocalDateTime timeDate) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.startTime = timeDate;
-        if (club != null) {
-            this.location = club.getName();
-            this.imageUrl = club.getLogoUrl();
-            //this.eventCategory = club.getClubCategory();  No such club category
-        }
-    }
-
+    private boolean isUserAttending;
+    private Integer totalAttendees;
 }
