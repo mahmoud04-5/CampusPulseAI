@@ -7,11 +7,13 @@ import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.service.IClubService;
 import com.example.campuspulseai.southbound.entity.Club;
+import com.example.campuspulseai.southbound.entity.Group;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.mapper.ClubMapper;
 import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.repository.IClubRepository;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 import com.example.campuspulseai.southbound.specification.IClubSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,12 +38,15 @@ public class ClubServiceImpl implements IClubService {
     private final EventMapper eventMapper;
     private final ClubMapper clubMapper;
     private final IClubSpecifications clubSpecifications;
+    private final IUserRepository userRepository;
 
     @Override
     public CreateClubResponse createClub(CreateClubRequest createClubRequest) throws AccessDeniedException {
         User user = authUtils.getAuthenticatedUser();
         Club club = clubMapper.toClub(createClubRequest, user);
         Club savedClub = clubRepository.save(club);
+        user.setGroup(new Group(1L, "GROUP_ORGANIZERS", null));
+        userRepository.save(user);
         return clubMapper.toCreateClubResponse(savedClub);
     }
 

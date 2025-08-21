@@ -17,11 +17,4 @@ public class SurveyQuestionDTO {
     private String questionText;
     private List<QuestionChoices> choices;
     private List<Long> selectedChoicesIds;
-
-    public SurveyQuestionDTO(Long id, String questionText, List<Long> choiceIds) {
-        this.questionId = id;
-        this.questionText = questionText;
-        this.choices = null;
-        this.selectedChoicesIds = choiceIds;
-    }
 }
