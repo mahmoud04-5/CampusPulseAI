@@ -9,4 +9,10 @@ public interface IAuthenticationService {
     void register(RegisterRequest input) throws Exception;
 
     LoginResponse login(AuthenticationRequest request);
+
+    void requestOtp(String email) throws Exception;
+
+    void verifyOtp(String email, String otp) throws Exception;
+
+    void resetPassword(String email, String newPassword) throws Exception;
 }
