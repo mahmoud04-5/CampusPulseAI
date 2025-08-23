@@ -34,4 +34,24 @@ public class AuthenticationController {
         return authenticationService.login(authRequest);
     }
 
+    @PostMapping("/forgot-password/request-otp")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Request OTP", description = "Sends a One-Time Password (OTP) to the user's email to reset the password.")
+    public void requestOTP(String email) {
+        // Implementation for requesting OTP
+    }
+
+    @PostMapping("/forgot-password/verify-otp")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Validate OTP", description = "Validates the provided OTP for the user's email.")
+    public void validateOTP(String email, String otp) {
+        // Implementation for validating OTP
+    }
+
+    @PostMapping("/forgot-password/reset")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Reset Password", description = "Resets the user's password using the provided OTP.")
+    public void resetPassword(String email, String newPassword) throws Exception {
+        authenticationService.resetPassword(email, newPassword);
+    }
 }
