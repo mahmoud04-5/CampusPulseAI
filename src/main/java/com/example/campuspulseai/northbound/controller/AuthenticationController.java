@@ -2,6 +2,7 @@ package com.example.campuspulseai.northbound.controller;
 
 import com.example.campuspulseai.domain.dto.request.AuthenticationRequest;
 import com.example.campuspulseai.domain.dto.request.RegisterRequest;
+import com.example.campuspulseai.domain.dto.request.VerifyOtpRequest;
 import com.example.campuspulseai.domain.dto.response.LoginResponse;
 import com.example.campuspulseai.service.IAuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,9 +44,10 @@ public class AuthenticationController {
 
     @PostMapping("/forgot-password/verify-otp")
     @ResponseStatus(HttpStatus.OK)
+    @CrossOrigin(origins = "*")
     @Operation(summary = "Validate OTP", description = "Validates the provided OTP for the user's email.")
-    public void validateOTP(String email, String otp) {
-        // Implementation for validating OTP
+    public void validateOTP(VerifyOtpRequest request) throws Exception {
+        authenticationService.verifyOtp(request);
     }
 
     @PostMapping("/forgot-password/reset")

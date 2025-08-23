@@ -23,11 +23,13 @@ public class UserOTP {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
-    private String otpCode;
+    @Column(name = "otp_code", nullable = false)
+    private String otp;
 
     private Boolean isVerified;
 
     @CreationTimestamp
     private Timestamp createdAt;
+
+    private Timestamp expiryDate;
 }

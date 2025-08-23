@@ -3,6 +3,7 @@ package com.example.campuspulseai.service.impl;
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.domain.dto.request.AuthenticationRequest;
 import com.example.campuspulseai.domain.dto.request.RegisterRequest;
+import com.example.campuspulseai.domain.dto.request.VerifyOtpRequest;
 import com.example.campuspulseai.domain.dto.response.LoginResponse;
 import com.example.campuspulseai.service.IAuthenticationService;
 import com.example.campuspulseai.service.IEmailService;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 
@@ -68,9 +70,31 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         // TODO: Implement OTP generation and sending logic
     }
 
+
+    @Transactional
     @Override
-    public void verifyOtp(String email, String otp) throws Exception {
-        // TODO verify the OTP
+    public void verifyOtp(VerifyOtpRequest request) throws Exception {
+        if (request == null || request.getEmail() == null || request.getEmail().isBlank() ||
+               request.getOtpCode() == null || request.getOtpCode().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and OTP cannot be null or empty");
+        }
+
+        UserOTP token = userOTPRepository.findByOtpAndEmail(request.getOtpCode(), request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or used OTP for email: " + request.getEmail()));
+
+        if (Boolean.TRUE.equals(token.getIsVerified())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "OTP already used/verified");
+        }
+
+        if (token.getExpiryDate().before(new Timestamp(System.currentTimeMillis()))) {
+            userOTPRepository.delete(token);
+            throw new ResponseStatusException(HttpStatus.GONE, "OTP has expired");
+        }
+
+
+        token.setIsVerified(true);
+        userOTPRepository.save(token);
+
     }
 
     @Override
