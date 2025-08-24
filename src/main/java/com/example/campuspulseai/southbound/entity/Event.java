@@ -1,6 +1,8 @@
 package com.example.campuspulseai.southbound.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -78,5 +80,12 @@ public class Event {
             throw new IllegalStateException("Start date is not set for the event");
         }
         return startTime; // Return the full ZonedDateTime
+    }
+
+    public void setTimeDate(@Future @NotNull LocalDateTime startTime) {
+    }
+
+    public LocalDateTime getTimeDate() {
+        return startTime;
     }
 }

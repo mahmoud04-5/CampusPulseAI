@@ -46,8 +46,10 @@ public class EventServiceImpl implements IEventService {
     private final UserEventMapper userEventMapper;
     private final IEventRecommendationService eventRecommendationService;
     private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
-    private static final String EVENT_NOT_FOUND = "Event not found with id: ";
     private final ISuggestedOrganizerEventsRepository suggestedOrganizerEventsRepository;
+    private static final String EVENT_NOT_FOUND = "Event not found with id: ";
+
+
 
     @SneakyThrows
     @Override
@@ -57,6 +59,7 @@ public class EventServiceImpl implements IEventService {
 
         Club club = getClubByOwnerId(user.getId());
         event.setClub(club);
+
         Event createdEvent = eventRepository.save(event);
         return eventMapper.mapToCreateEventResponse(createdEvent);
     }
@@ -229,6 +232,7 @@ public class EventServiceImpl implements IEventService {
     }
 
 
+
     @SneakyThrows
     @Override
     public GetEventResponse getEventDetails(Long id) {
@@ -237,6 +241,8 @@ public class EventServiceImpl implements IEventService {
         boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), id));
         return eventMapper.mapToEventResponseDetails(event, isUserAttending);
     }
+
+
 
 
     // Helper

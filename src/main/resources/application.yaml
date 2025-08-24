@@ -5,6 +5,7 @@ spring:
   application:
     name: CampusPulseAi
 
+
   ai:
     openai:
       api-key: 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

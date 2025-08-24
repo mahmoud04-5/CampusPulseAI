@@ -15,15 +15,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ClubMapper {
+    @Mapping(source = "clubName", target = "name")
     @Mapping(source = "id", target = "clubId")
+    @Mapping(source = "description", target = "description")
     GetClubResponse toDto(Club club);
+    List<GetClubResponse> toGetClubResponse (List<Club> clubs);
 
-    List<GetClubResponse> toGetClubResponse(List<Club> clubs);
 
-    ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
-
-    @Mapping(source = "club.id", target = "clubId")
-    CreateClubResponse toCreateClubResponse(Club club);
 
     @Mapping(source = "club.id", target = "clubId")
     @Mapping(source = "club.owner.id", target = "organizerResponse.id")
@@ -34,9 +32,18 @@ public interface ClubMapper {
 
     void updateClubFromRequest(CreateClubRequest request, @MappingTarget Club club);
 
-    @Mapping(source = "request.clubName", target = "name")
+    @Mapping(source = "request.clubName", target = "clubName")
     @Mapping(source = "request.clubDescription", target = "description")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")
     Club toClub(CreateClubRequest request, User user);
+
+
+    @Mapping(source = "club.id", target = "clubId")
+    CreateClubResponse toCreateClubResponse(Club club);
+
+
+
+
+
 }
