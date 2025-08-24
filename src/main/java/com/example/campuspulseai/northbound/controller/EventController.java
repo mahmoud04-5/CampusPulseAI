@@ -76,15 +76,16 @@ public class EventController {
     @Operation(summary = "Suggests events to attend", description = "Searches for events based on user preferences.")
     @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> suggestEventsToAttend() {
-        return eventService.suggestEventsToAttend();
+    public List<GetEventResponse> suggestEventsToAttend(
+            @RequestParam(required = false, defaultValue = "5") Integer limit
+    ) throws Exception {
+        return eventService.suggestEventsToAttend(limit);
     }
 
     @Operation(summary = "Suggest events to create", description = "Suggests events that the Organizer might want to create based on students interests.")
     @GetMapping("/create-suggestions")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> suggestEventsToCreate() {
-        // Logic to suggest events based on user interests
         return eventService.suggestEventsToCreate();
     }
 
@@ -119,7 +120,6 @@ public class EventController {
     public List<GetUserResponse> getAttendeesByEventId(@PathVariable Long eventId) {
         return eventService.getAttendeesByEventId(eventId);
     }
-
 
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")

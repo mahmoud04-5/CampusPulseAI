@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 
 @Component
 public class EventSpecifications implements IEventSpecifications {
+    private static final int DAYS = 90;
+    private static final String TIME_DATE = "timeDate";
+
     @Override
     public Specification<Event> hasClubId(Long clubId) {
         return (root, query, cb) -> clubId == null
@@ -32,8 +35,24 @@ public class EventSpecifications implements IEventSpecifications {
             LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
 
             return cb.and(
-                    cb.greaterThanOrEqualTo(root.get("timeDate"), startOfDay),
-                    cb.lessThan(root.get("timeDate"), startOfNextDay)
+                    cb.greaterThanOrEqualTo(root.get(TIME_DATE), startOfDay),
+                    cb.lessThan(root.get(TIME_DATE), startOfNextDay)
+            );
+        };
+    }
+
+    @Override
+    public Specification<Event> hasEventWithinGivenDays() {
+        LocalDateTime eventDateTime = LocalDateTime.now();
+        return (root, query, cb) -> {
+
+            LocalDate date = eventDateTime.toLocalDate();
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime startOfNextWeek = date.plusDays(DAYS).atStartOfDay();
+
+            return cb.and(
+                    cb.greaterThanOrEqualTo(root.get(TIME_DATE), startOfDay),
+                    cb.lessThan(root.get(TIME_DATE), startOfNextWeek)
             );
         };
     }

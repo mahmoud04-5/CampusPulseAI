@@ -7,12 +7,14 @@ import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.service.IClubRecommendationService;
 import com.example.campuspulseai.service.IClubService;
+import com.example.campuspulseai.southbound.entity.Club;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +26,6 @@ import java.nio.file.AccessDeniedException;
 @Tag(name = "Club endpoints", description = "Endpoints for club operations")
 @RequestMapping("/api/clubs")
 public class ClubController {
-
 
     private final IClubService clubService;
     private final IClubRecommendationService clubRecommendationService;
@@ -81,4 +82,3 @@ public class ClubController {
 
 
 }
-

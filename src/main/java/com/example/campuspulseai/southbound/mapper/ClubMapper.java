@@ -4,7 +4,6 @@ import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
-import com.example.campuspulseai.domain.dto.response.OrganizerResponse;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.Mapper;
@@ -18,7 +17,8 @@ import java.util.List;
 public interface ClubMapper {
     @Mapping(source = "id", target = "clubId")
     GetClubResponse toDto(Club club);
-    List<GetClubResponse> toGetClubResponse (List<Club> clubs);
+
+    List<GetClubResponse> toGetClubResponse(List<Club> clubs);
 
     ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
 
@@ -34,7 +34,7 @@ public interface ClubMapper {
 
     void updateClubFromRequest(CreateClubRequest request, @MappingTarget Club club);
 
-    @Mapping(source = "request.clubName", target = "clubName")
+    @Mapping(source = "request.clubName", target = "name")
     @Mapping(source = "request.clubDescription", target = "description")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")

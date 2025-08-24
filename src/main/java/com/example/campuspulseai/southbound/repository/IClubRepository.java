@@ -10,8 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface IClubRepository extends JpaRepository<Club,Long> {
-    Optional<Club> findByClubNameIgnoreCase(String clubName);
+public interface IClubRepository extends JpaRepository<Club, Long> {
+    Optional<Club> findByNameIgnoreCase(String clubName);
+
     Optional<Club> findByOwnerId(Long id);
 
     Page<Club> findAll(Specification<Club> spec, Pageable pageable);

@@ -16,6 +16,7 @@ import com.example.campuspulseai.southbound.repository.IUserOTPRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,6 +47,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private static final String OTP_SUBJECT = "Your OTP Code";
 
 
+    @PreAuthorize("permitAll()")
     @Override
     @Transactional
     public void register(RegisterRequest registerRequest) throws Exception {
