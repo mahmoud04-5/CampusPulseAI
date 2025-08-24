@@ -7,15 +7,15 @@ public enum Category {
     TECHNOLOGY("Technology"),
     HEALTH("Health"),
     ARTS("Arts"),
-    RELIFION("Religion");
+    RELIGION("Religion");
 
-    private final String category;
+    private final String name;
 
     Category(String category) {
-        this.category = category;
+        this.name = category;
     }
 
     public String getCategory() {
-        return category;
+        return name;
     }
 }

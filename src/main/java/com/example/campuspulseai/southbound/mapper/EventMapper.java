@@ -5,14 +5,18 @@ import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.Event;
+import com.example.campuspulseai.southbound.entity.SuggestedUserEvent;
+import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    // Create Event -> Entity
+    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -37,6 +41,10 @@ public interface EventMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "timeDate", source = "startTime")
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    SuggestedUserEvent mapToSuggestedUserEvent(Event event, User user);
 
     List<GetEventResponse> toGetEventResponseList(List<Event> byClubId);
 }

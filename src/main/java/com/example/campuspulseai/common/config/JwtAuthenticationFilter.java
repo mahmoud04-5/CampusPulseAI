@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
         final String jwt = extractJwtFromRequest(request);
         if (jwt == null) {
             filterChain.doFilter(request, response);
