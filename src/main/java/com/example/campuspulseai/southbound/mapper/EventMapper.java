@@ -1,5 +1,6 @@
 package com.example.campuspulseai.southbound.mapper;
 
+import com.example.campuspulseai.domain.dto.SuggestedEventParts;
 import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
@@ -10,7 +11,6 @@ import com.example.campuspulseai.southbound.entity.SuggestedOrganizerEvent;
 import com.example.campuspulseai.southbound.entity.SuggestedUserEvent;
 import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 

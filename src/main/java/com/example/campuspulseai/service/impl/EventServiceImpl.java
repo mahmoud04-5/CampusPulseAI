@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +46,7 @@ public class EventServiceImpl implements IEventService {
     private final UserEventMapper userEventMapper;
     private final IEventRecommendationService eventRecommendationService;
     private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
+    private final ISuggestedOrganizerEventsRepository suggestedOrganizerEventsRepository;
     private static final String EVENT_NOT_FOUND = "Event not found with id: ";
 
 
@@ -218,8 +218,8 @@ public class EventServiceImpl implements IEventService {
                 : LocalDateTime.now(ZoneId.of("Europe/Helsinki"));
 
         List<Event> events = (category != null && !category.isEmpty())
-                ? eventRepository.findByTimeDateAfterAndCategory(filterDate, category)
-                : eventRepository.findByTimeDateAfter(filterDate);
+                ? eventRepository.findByStartTimeAfterAndCategory(filterDate, category)
+                : eventRepository.findByStartTimeAfter(filterDate);
 
         User user = authUtils.getAuthenticatedUser();
 
