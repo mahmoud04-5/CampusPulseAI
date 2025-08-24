@@ -4,6 +4,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
 import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,19 +74,21 @@ public class EventController {
     }
 
 
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Suggests events to attend", description = "Searches for events based on user preferences.")
     @GetMapping("/attend-suggestions")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> suggestEventsToAttend() {
-        // Logic to suggest events based on interests
-        return eventService.suggestEventsToAttend();
+    public List<GetEventResponse> suggestEventsToAttend(
+            @RequestParam(required = false, defaultValue = "5") Integer limit
+    ) throws Exception {
+        return eventService.suggestEventsToAttend(limit);
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     @Operation(summary = "Suggest events to create", description = "Suggests events that the Organizer might want to create based on students interests.")
     @GetMapping("/create-suggestions")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetEventResponse> suggestEventsToCreate() {
-        // Logic to suggest events based on user interests
+    public List<GetEventSuggestionResponse> suggestEventsToCreate() {
         return eventService.suggestEventsToCreate();
     }
 
@@ -94,6 +97,7 @@ public class EventController {
     @GetMapping("/my-events")
     @ResponseStatus(HttpStatus.OK)
     public List<GetEventResponse> getEventsAttending() {
+        // Logic to get events the user is attending
         return eventService.getAllEventsForCurrentUser();
     }
 
@@ -108,8 +112,9 @@ public class EventController {
     @Operation(summary = "Unattend an event", description = "Allows the currently authenticated user to cancel their RSVP for an event by its ID.")
     @DeleteMapping("/{eventId}/rsvp")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unattendEvent(@PathVariable Long eventId) {
+    public ResponseEntity<Void> unattendEvent(@PathVariable Long eventId) {
         eventService.unattendEvent(eventId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Get attendees of an event", description = "Retrieves a list of users attending a specific event by its ID.")
@@ -118,7 +123,6 @@ public class EventController {
     public List<GetUserResponse> getAttendeesByEventId(@PathVariable Long eventId) {
         return eventService.getAttendeesByEventId(eventId);
     }
-
 
     @Operation(summary = "Get upcoming events", description = "Retrieves a list of upcoming events based on the provided date and label.")
     @GetMapping("/upcoming")

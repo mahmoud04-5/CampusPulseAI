@@ -6,26 +6,25 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
 import com.example.campuspulseai.domain.dto.response.GetUserResponse;
+import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.mapper.UserEventMapper;
 import com.example.campuspulseai.southbound.mapper.UserMapper;
 import com.example.campuspulseai.southbound.repository.*;
-import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-
-
-
-
-import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.specification.impl.EventSpecifications;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -46,6 +45,8 @@ public class EventServiceImpl implements IEventService {
     private final EventSpecifications eventSpecifications;
     private final UserMapper userMapper;
     private final UserEventMapper userEventMapper;
+    private final IEventRecommendationService eventRecommendationService;
+    private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
     private static final String EVENT_NOT_FOUND = "Event not found with id: ";
 
 
@@ -54,7 +55,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
         User user = authUtils.getAuthenticatedUser();
-        Event event = eventMapper.mapToClub(createEventRequest);
+        Event event = eventMapper.mapToEvent(createEventRequest);
 
         Club club = getClubByOwnerId(user.getId());
         event.setClub(club);
@@ -74,7 +75,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public CreateEventResponse updateEvent(Long id, EditEventRequest editEventRequest) {
         Event event = getEventFromDBById(id);
-        Club club = clubRepository.getById(event.getClub().getId());
+        Club club = event.getClub();
         User user = authUtils.getAuthenticatedUser();
         validateUserClubOwnership(user, club);
         validateEventTime(event);
@@ -93,7 +94,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public void deleteEventById(Long id) {
         Event event = getEventFromDBById(id);
-        Club club = clubRepository.getById(event.getClub().getId());
+        Club club = event.getClub();
         User user = authUtils.getAuthenticatedUser();
         validateUserClubOwnership(user, club);
         validateEventTime(event);
@@ -116,13 +117,35 @@ public class EventServiceImpl implements IEventService {
 
 
     @Override
-    public List<GetEventResponse> suggestEventsToAttend() {
+    @Transactional
+    public List<GetEventResponse> suggestEventsToAttend(int limit) throws Exception {
+        User user = authUtils.getAuthenticatedUser();
+        List<Event> suggestedEvents = getSuggestedUserEventsByUserId(user);
+
+        if (!suggestedEvents.isEmpty()) {
+            return getEventResponsesFromSuggestedEvents(user, suggestedEvents, limit);
+        }
+
+        List<Long> eventIds = eventRecommendationService.getRecommendedEventIds(user.getId());
+        if (eventIds != null && !eventIds.isEmpty()) {
+            List<Event> savedEvents = getAllEventsByIds(eventIds);
+
+            saveAllRecommendedEvents(savedEvents, user);
+            return getEventResponsesFromSuggestedEvents(user, savedEvents, limit);
+        }
         return List.of();
     }
 
     @Override
-    public List<GetEventResponse> suggestEventsToCreate() {
-        return List.of();
+    @Transactional
+    public List<GetEventSuggestionResponse> suggestEventsToCreate() {
+        List<SuggestedOrganizerEvent> suggestedEvents = suggestedOrganizerEventsRepository.findAll();
+        if (suggestedEvents.isEmpty()) {
+            List<SuggestedOrganizerEvent> newSuggestions = eventRecommendationService.getSuggestedOrganizerEvents();
+            suggestedOrganizerEventsRepository.saveAll(newSuggestions);
+            return eventMapper.mapToGetEventSuggestionResponse(newSuggestions);
+        }
+        return eventMapper.mapToGetEventSuggestionResponse(suggestedEvents);
     }
 
     @Override
@@ -222,7 +245,7 @@ public class EventServiceImpl implements IEventService {
 
 
 
-    // ---------- Helper methods ----------
+    // Helper
     private Event getEventFromDBById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + id));
@@ -242,4 +265,34 @@ public class EventServiceImpl implements IEventService {
             );
         }
     }
+
+    private List<Event> getSuggestedUserEventsByUserId(User user) {
+        return suggestedUserEventsRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(SuggestedUserEvent::getEvent)
+                .toList();
+    }
+
+    private List<GetEventResponse> getEventResponsesFromSuggestedEvents(User user, List<Event> suggestedEvents, int limit) {
+        return suggestedEvents.stream()
+                .map(event -> {
+                    boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), event.getId()));
+                    return eventMapper.mapToEventResponseDetails(event, isUserAttending);
+                })
+                .limit(limit)
+                .toList();
+    }
+
+    private List<Event> getAllEventsByIds(List<Long> eventIds) {
+        return eventRepository.findAllById(eventIds).stream()
+                .toList();
+    }
+
+    private void saveAllRecommendedEvents(List<Event> savedEvents, User user) {
+        suggestedUserEventsRepository.saveAll(savedEvents.stream()
+                .map(event -> eventMapper.mapToSuggestedUserEvent(event, user))
+                .toList()
+        );
+    }
+
 }

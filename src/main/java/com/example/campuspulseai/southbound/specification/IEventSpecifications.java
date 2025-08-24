@@ -12,4 +12,6 @@ public interface IEventSpecifications {
     Specification<Event> isActive();
 
     Specification<Event> hasEventDate(LocalDateTime eventDateTime);
+
+    Specification<Event> hasEventWithinGivenDays();
 }
