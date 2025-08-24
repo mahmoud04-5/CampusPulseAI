@@ -20,7 +20,7 @@ public class GetEventResponse {
     private LocalDateTime startTime;
     private Integer capacity;
     private String imageUrl;
-    private String eventCategory;
+    private String category;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private boolean isUserAttending;

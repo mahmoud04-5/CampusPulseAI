@@ -13,7 +13,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -72,7 +75,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
 
     private String askAIForClubRecommendations(String userInterests) {
         List<String> allClubNames = clubRepository.findAll().stream()
-                .map(Club::getClubName)
+                .map(Club::getName)
                 .toList();
         String clubNamesList = String.join(", ", allClubNames);
         String prompt = String.format(
@@ -102,13 +105,13 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
 
     private Club findBestMatchingClub(String recommendedName, List<Club> allClubs) {
         return allClubs.stream()
-                .filter(club -> club.getClubName() != null)
+                .filter(club -> club.getName() != null)
                 .max((club1, club2) -> {
-                    double sim1 = calculateLevenshteinSimilarity(recommendedName, club1.getClubName());
-                    double sim2 = calculateLevenshteinSimilarity(recommendedName, club2.getClubName());
+                    double sim1 = calculateLevenshteinSimilarity(recommendedName, club1.getName());
+                    double sim2 = calculateLevenshteinSimilarity(recommendedName, club2.getName());
                     return Double.compare(sim1, sim2);
                 })
-                .filter(club -> calculateLevenshteinSimilarity(recommendedName, club.getClubName()) >= SIMILARITY_THRESHOLD)
+                .filter(club -> calculateLevenshteinSimilarity(recommendedName, club.getName()) >= SIMILARITY_THRESHOLD)
                 .orElse(null);
     }
 
