@@ -3,7 +3,6 @@ package com.example.campuspulseai.service.impl;
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.SuggestedEventParts;
-import com.example.campuspulseai.service.IAiService;
 import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.southbound.Enum.Category;
 import com.example.campuspulseai.southbound.entity.*;
