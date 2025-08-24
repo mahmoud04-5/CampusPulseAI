@@ -11,8 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface IEventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
-    List<Event> findByTimeDateAfterAndCategory(LocalDateTime startDate, String category);
-    List<Event> findByTimeDateAfter(LocalDateTime filterDate);
+    List<Event> findByStartTimeAfterAndCategory(LocalDateTime startDate, String category);
+
+    List<Event> findByStartTimeAfter(LocalDateTime filterDate);
 
     Optional<Event> findByIdAndIsActiveTrue(Long id);
 

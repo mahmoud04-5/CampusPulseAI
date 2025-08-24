@@ -1,6 +1,8 @@
 package com.example.campuspulseai.southbound.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,7 +58,7 @@ public class Event {
     private Timestamp updatedAt;
 
     @Column(name = "start_date")
-    private LocalDateTime timeDate; // Renamed for clarity and consistency
+    private LocalDateTime startTime;
 
     @OneToMany(mappedBy = "event")
     private List<UserEvent> attendees = new ArrayList<>();
@@ -74,9 +76,16 @@ public class Event {
     }
 
     public LocalDateTime getStartDate() {
-        if (timeDate == null) {
+        if (startTime == null) {
             throw new IllegalStateException("Start date is not set for the event");
         }
-        return timeDate; // Return the full ZonedDateTime
+        return startTime; // Return the full ZonedDateTime
+    }
+
+    public void setTimeDate(@Future @NotNull LocalDateTime startTime) {
+    }
+
+    public LocalDateTime getTimeDate() {
+        return startTime;
     }
 }
