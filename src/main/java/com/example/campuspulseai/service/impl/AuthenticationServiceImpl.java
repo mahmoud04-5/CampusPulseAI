@@ -16,6 +16,7 @@ import com.example.campuspulseai.southbound.repository.IUserOTPRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -154,15 +155,27 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     private void validateOTPExpiry(UserOTP userOTP) {
-        if (userOTP.getCreatedAt().toLocalDateTime().isAfter(LocalDateTime.now().plusMinutes(OTP_EXPIRATION_MINUTES))) {
+        Timestamp expiryTime = Timestamp.valueOf(
+                userOTP.getCreatedAt().toLocalDateTime().plusMinutes(OTP_EXPIRATION_MINUTES)
+        );
+        if (expiryTime.before(new Timestamp(System.currentTimeMillis()))) {
             userOTPRepository.deleteById(userOTP.getId());
             throw new ResponseStatusException(HttpStatus.GONE, "OTP is expired");
         }
     }
 
+
     private void validateNewpassword(User user, String newPassword) {
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must be different from the old password");
         }
+    }
+
+    @Scheduled(cron = "0 0 * * * *") // Runs hourly
+    @Transactional
+    public void cleanupExpiredOtps() {
+        userOTPRepository.deleteByCreatedAtBefore(
+                Timestamp.valueOf(LocalDateTime.now().minusMinutes(OTP_EXPIRATION_MINUTES))
+        );
     }
 }

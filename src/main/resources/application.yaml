@@ -49,8 +49,6 @@ spring:
           auth: true
           starttls:
             enable: true
-            required: true
-        debug: true
 
 springdoc:
   swagger-ui:
