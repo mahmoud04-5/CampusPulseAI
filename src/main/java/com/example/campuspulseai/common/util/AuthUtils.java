@@ -6,8 +6,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
+
 @Component
 public class AuthUtils implements IAuthUtils {
+
+    private final SecureRandom random = new SecureRandom();
 
     @Override
     public User getAuthenticatedUser() {
@@ -21,5 +25,12 @@ public class AuthUtils implements IAuthUtils {
 
         return (User) authentication.getPrincipal();
     }
+
+    @Override
+    public String generateOtp(int length) {
+        int randomNumber = random.nextInt(1000000); // Generate a random number between 0 and 999999
+        return String.format("%06d", randomNumber);
+    }
+
 
 }

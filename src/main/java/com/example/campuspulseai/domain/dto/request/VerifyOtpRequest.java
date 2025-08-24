@@ -3,20 +3,17 @@ package com.example.campuspulseai.domain.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
-@AllArgsConstructor
-public class AuthenticationRequest {
-
+@Getter
+public class VerifyOtpRequest {
     @Email
     @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters")
-    private String password;
+    @Size(min = 6, max = 6, message = "OTP code must be 6 characters")
+    @NotBlank(message = "OTP code is required")
+    private String otpCode;
 }

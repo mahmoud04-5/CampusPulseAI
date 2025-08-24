@@ -38,6 +38,20 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: campuspulseai@gmail.com
+    password: mjbc kxzs uhyk bczm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        debug: true
+
 springdoc:
   swagger-ui:
     path: /docs
