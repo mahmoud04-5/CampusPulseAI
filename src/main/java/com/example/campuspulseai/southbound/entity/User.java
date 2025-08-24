@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
 
 import java.sql.Timestamp;
 import java.util.Collection;

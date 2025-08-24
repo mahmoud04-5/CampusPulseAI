@@ -11,19 +11,18 @@ import com.example.campuspulseai.southbound.entity.SuggestedOrganizerEvent;
 import com.example.campuspulseai.southbound.entity.SuggestedUserEvent;
 import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
-
+    // Create Event -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
     Event mapToEvent(CreateEventRequest request);
 
     // Entity -> CreateEventResponse
@@ -31,6 +30,7 @@ public interface EventMapper {
     CreateEventResponse mapToCreateEventResponse(Event event);
 
     // Entity -> GetEventResponse
+    @Mapping(target = "startTime", source = "event.timeDate")
     @Mapping(target = "userAttending", source = "isAttending")
     @Mapping(target = "totalAttendees", source = "event.totalAttendees")
     GetEventResponse mapToEventResponseDetails(Event event, boolean isAttending);
@@ -40,6 +40,7 @@ public interface EventMapper {
 
     // Edit Event -> Update Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "timeDate", source = "startTime")
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 
     @Mapping(target = "id", ignore = true)

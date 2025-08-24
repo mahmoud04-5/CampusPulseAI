@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.impl;
+package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;

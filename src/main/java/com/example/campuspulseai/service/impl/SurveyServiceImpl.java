@@ -10,6 +10,7 @@ import com.example.campuspulseai.southbound.mapper.SurveyQuestionMapper;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyUserAnswersRepository;
+import com.example.campuspulseai.southbound.repository.IUserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class SurveyServiceImpl implements ISurveyService {
+    private final IUserRepository userRepository;
     private final ISurveyQuestionRepository surveyQuestionRepository;
     private final ISurveyUserAnswersRepository surveyUserAnswersRepository;
     private final IQuestionChoicesRepository questionChoicesRepository;
@@ -44,7 +46,7 @@ public class SurveyServiceImpl implements ISurveyService {
     @Override
     public List<SurveyQuestionDTO> getAllSurveyQuestions() {
         List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
-        return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions); // MapStruct handles the list
+        return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions);
     }
 
     // ---------- Helper methods ----------
