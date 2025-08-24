@@ -1,13 +1,20 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: CampusPulseAi
+
+  ai:
+    openai:
+      api-key: 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
 
   jwt:
     secret: 784478f2757b1596b7b5013f61a5302401d077e21bed3a51558d423e02381c83
     expiration: 86400000 # 1 day in ms
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/campuspulseai-local   #jdbc:postgresql://localhost:3307/campus_pulse
+    url: jdbc:postgresql://10.0.10.7:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
     username: postgres
     password: qeema**123 #postgres
     driver-class-name: org.postgresql.Driver

@@ -5,6 +5,8 @@ import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.southbound.entity.Event;
+import com.example.campuspulseai.southbound.entity.SuggestedUserEvent;
+import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -19,21 +21,30 @@ public interface EventMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "timeDate", source = "request.startTime")
-    Event mapToClub(CreateEventRequest request);
+    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
+    Event mapToEvent(CreateEventRequest request);
 
-    @Mapping(target = "eventId", source = "event.id")
+    // Entity -> CreateEventResponse
+    @Mapping(target = "eventId", source = "id")
     CreateEventResponse mapToCreateEventResponse(Event event);
 
+    // Entity -> GetEventResponse
     @Mapping(target = "startTime", source = "event.timeDate")
-    GetEventResponse mapToEventResponseDetails(Event event);
+    @Mapping(target = "userAttending", source = "isAttending")
+    @Mapping(target = "totalAttendees", source = "event.totalAttendees")
+    GetEventResponse mapToEventResponseDetails(Event event, boolean isAttending);
 
+    // List<Entity> -> List<GetEventResponse>
+    List<GetEventResponse> mapToEventResponseDetailsList(List<Event> events);
+
+    // Edit Event -> Update Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "timeDate", source = "startTime")
-        // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 
-    @Mapping(source = "startDate", target = "startTime")
-    @Mapping(source = "category", target = "eventCategory")
-    List<GetEventResponse> toGetEventResponseList(List<Event> events);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    SuggestedUserEvent mapToSuggestedUserEvent(Event event, User user);
+
+    List<GetEventResponse> toGetEventResponseList(List<Event> byClubId);
 }

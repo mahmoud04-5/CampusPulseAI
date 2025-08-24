@@ -23,9 +23,9 @@ public class SurveyQuestion {
     @Column(columnDefinition = "TEXT")
     private String question;
 
-    private String category;
 
 
+    @Column(name = "allow_mulltiple_answers", nullable = false)
     private Boolean allowMultipleAnswers = false;
 
     @OneToMany(mappedBy = "question",

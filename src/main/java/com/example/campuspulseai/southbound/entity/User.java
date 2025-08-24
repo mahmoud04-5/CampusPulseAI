@@ -10,9 +10,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
@@ -49,12 +51,14 @@ public class User implements UserDetails {
     private Timestamp updatedAt;
 
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<SurveyUserAnswers> userAnswers;
-//
-//
-//    @Column(nullable = false)
-//    private boolean surveyCompleted = false;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SurveyUserAnswers> userAnswers;
+
+
+
+
+    @OneToMany(mappedBy = "user")
+    private List<UserEvent> userAttendedEvents;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -68,8 +72,9 @@ public class User implements UserDetails {
         return email;
     }
 
-//    public List<SurveyUserAnswers> getSurveyUserAnswers() {
-//        return userAnswers;
-//    }
+    public List<SurveyUserAnswers> getSurveyUserAnswers() {
+        return userAnswers;
+    }
+
 }
 
