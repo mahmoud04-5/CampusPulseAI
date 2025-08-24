@@ -1,6 +1,7 @@
 package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
+import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.AuthenticationRequest;
 import com.example.campuspulseai.domain.dto.request.RegisterRequest;
 import com.example.campuspulseai.domain.dto.request.VerifyOtpRequest;
@@ -10,6 +11,7 @@ import com.example.campuspulseai.service.IEmailService;
 import com.example.campuspulseai.southbound.entity.User;
 import com.example.campuspulseai.southbound.entity.UserOTP;
 import com.example.campuspulseai.southbound.mapper.AuthMapper;
+import com.example.campuspulseai.southbound.mapper.OTPMapper;
 import com.example.campuspulseai.southbound.repository.IUserOTPRepository;
 import com.example.campuspulseai.southbound.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IEmailService emailService;
     private final IUserOTPRepository userOTPRepository;
     private static final int OTP_EXPIRATION_MINUTES = 2;
+    private final IAuthUtils authUtils;
+    private final OTPMapper otpMapper;
+
+    private static final String OTP_SUBJECT = "Your OTP Code";
+
 
     @Override
     @Transactional
@@ -67,9 +74,20 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     public void requestOtp(String email) throws Exception {
-        // TODO: Implement OTP generation and sending logic
+        userOTPRepository.deleteByEmail(email);
+        String otp = authUtils.generateOtp(6);
+        Timestamp expiryTime = calculateExpiry();
+        UserOTP userOtp = otpMapper.toEntity(email, otp, expiryTime);
+        userOTPRepository.save(userOtp);
+        emailService.sendEmail(email, OTP_SUBJECT,
+                "Your OTP code is: " + otp + ". It will expire in " + OTP_EXPIRATION_MINUTES + " minutes.");
     }
 
+    private Timestamp calculateExpiry() {
+        return Timestamp.from(
+                java.time.Instant.now().plusSeconds(OTP_EXPIRATION_MINUTES * 60L)
+        );
+    }
 
     @Transactional
     @Override

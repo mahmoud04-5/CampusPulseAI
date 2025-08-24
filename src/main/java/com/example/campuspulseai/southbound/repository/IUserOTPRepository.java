@@ -10,4 +10,6 @@ public interface IUserOTPRepository extends JpaRepository<UserOTP, Long> {
     Optional<UserOTP> findByEmail(String email);
     Optional<UserOTP>findByOtpAndEmail(String otpCode, String email);
     void deleteByExpiryDateBefore(LocalDateTime expiryDate);
+    void deleteByEmail(String email);
+
 }
