@@ -36,6 +36,7 @@ public class AuthenticationController {
         return authenticationService.login(authRequest);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/forgot-password/request-otp")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Request OTP", description = "Sends a One-Time Password (OTP) to the user's email to reset the password.")
