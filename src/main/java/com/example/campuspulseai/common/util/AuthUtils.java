@@ -28,11 +28,8 @@ public class AuthUtils implements IAuthUtils {
 
     @Override
     public String generateOtp(int length) {
-        StringBuilder otp = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            otp.append(random.nextInt(10)); // digit 0–9
-        }
-        return otp.toString();
+        int randomNumber = random.nextInt(1000000); // Generate a random number between 0 and 999999
+        return String.format("%06d", randomNumber);
     }
 
 

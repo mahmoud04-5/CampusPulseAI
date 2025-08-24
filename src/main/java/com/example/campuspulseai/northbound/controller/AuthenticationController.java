@@ -38,15 +38,15 @@ public class AuthenticationController {
     @PostMapping("/forgot-password/request-otp")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Request OTP", description = "Sends a One-Time Password (OTP) to the user's email to reset the password.")
-    public void requestOTP(String email) {
-        // Implementation for requesting OTP
+    public void requestOTP(String email) throws Exception {
+        authenticationService.requestOtp(email);
     }
 
     @PostMapping("/forgot-password/verify-otp")
     @ResponseStatus(HttpStatus.OK)
     @CrossOrigin(origins = "*")
     @Operation(summary = "Validate OTP", description = "Validates the provided OTP for the user's email.")
-    public void validateOTP(VerifyOtpRequest request) throws Exception {
+    public void validateOTP(@Valid @RequestBody VerifyOtpRequest request) throws Exception {
         authenticationService.verifyOtp(request);
     }
 

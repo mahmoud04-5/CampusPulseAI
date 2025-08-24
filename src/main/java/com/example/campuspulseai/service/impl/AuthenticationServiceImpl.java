@@ -49,13 +49,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @PreAuthorize("permitAll()")
     @Override
-    @Transactional
     public void register(RegisterRequest registerRequest) throws Exception {
 
         registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         User user = authenticationMapper.mapToUser(registerRequest);
         userRepository.save(user);
-        sendWelcomeEmail(user);
     }
 
     @Override
@@ -75,9 +73,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
+    @Transactional
     public void requestOtp(String email) throws Exception {
-        userOTPRepository.deleteByEmail(email);
-        String otp = authUtils.generateOtp(6);
+        userOTPRepository.deleteAllByEmail(email);
+        String otp = generateUniqueOtp();
         Timestamp expiryTime = calculateExpiry();
         UserOTP userOtp = otpMapper.toEntity(email, otp, expiryTime);
         userOTPRepository.save(userOtp);
@@ -94,23 +93,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Transactional
     @Override
     public void verifyOtp(VerifyOtpRequest request) throws Exception {
-        if (request == null || request.getEmail() == null || request.getEmail().isBlank() ||
-               request.getOtpCode() == null || request.getOtpCode().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and OTP cannot be null or empty");
-        }
 
         UserOTP token = userOTPRepository.findByOtpAndEmail(request.getOtpCode(), request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or used OTP for email: " + request.getEmail()));
 
-        if (Boolean.TRUE.equals(token.getIsVerified())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "OTP already used/verified");
-        }
+        validateOTPIsNotVerified(token);
 
-        if (token.getExpiryDate().before(new Timestamp(System.currentTimeMillis()))) {
-            userOTPRepository.delete(token);
-            throw new ResponseStatusException(HttpStatus.GONE, "OTP has expired");
-        }
-
+        validateOTPExpiry(token);
 
         token.setIsVerified(true);
         userOTPRepository.save(token);
@@ -122,37 +111,58 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public void resetPassword(String email, String newPassword) throws Exception {
         UserOTP userOTP = getUserOTPByEmail(email);
 
-        validateOTP(userOTP);
+        validateOTPIsVerified(userOTP);
+        validateOTPExpiry(userOTP);
 
         User user = getUserByEmail(email);
+        validateNewpassword(user, newPassword);
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         userOTPRepository.deleteById(userOTP.getId());
     }
 
-    private void sendWelcomeEmail(User user) {
-        String subject = "Welcome to Campus Pulse AI!";
-        String body = "Dear " + user.getFirstName() + " " + user.getLastName() + ",\n\nThank you for registering with Campus Pulse AI. We are excited to have you on board!\n\nBest regards,\nCampus Pulse AI Team";
-        emailService.sendEmail(user.getEmail(), subject, body);
-    }
 
     private UserOTP getUserOTPByEmail(String email) {
         return userOTPRepository.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new ResourceNotFoundException("No OTP request found for this email"));
     }
 
-    private void validateOTP(UserOTP userOTP) {
-        if (!userOTP.getIsVerified()) {
+    private void validateOTPIsVerified(UserOTP userOTP) {
+        if (Boolean.FALSE.equals(userOTP.getIsVerified())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP not verified");
-        }
-        if (userOTP.getCreatedAt().toLocalDateTime().isAfter(LocalDateTime.now().plusMinutes(OTP_EXPIRATION_MINUTES))) {
-            userOTPRepository.deleteById(userOTP.getId());
-            throw new ResponseStatusException(HttpStatus.GONE, "OTP is expired");
         }
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    }
+
+    private String generateUniqueOtp() {
+        String otp = authUtils.generateOtp(6);
+        // check database for existence
+        if (Boolean.TRUE.equals(userOTPRepository.existsByOtp(otp))) {
+            return generateUniqueOtp(); // recursion
+        }
+        return otp;
+    }
+
+    private void validateOTPIsNotVerified(UserOTP userOTP) {
+        if (Boolean.TRUE.equals(userOTP.getIsVerified())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "OTP already used/verified");
+        }
+    }
+
+    private void validateOTPExpiry(UserOTP userOTP) {
+        if (userOTP.getCreatedAt().toLocalDateTime().isAfter(LocalDateTime.now().plusMinutes(OTP_EXPIRATION_MINUTES))) {
+            userOTPRepository.deleteById(userOTP.getId());
+            throw new ResponseStatusException(HttpStatus.GONE, "OTP is expired");
+        }
+    }
+
+    private void validateNewpassword(User user, String newPassword) {
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must be different from the old password");
+        }
     }
 }

@@ -8,8 +8,13 @@ import java.util.Optional;
 
 public interface IUserOTPRepository extends JpaRepository<UserOTP, Long> {
     Optional<UserOTP> findByEmail(String email);
-    Optional<UserOTP>findByOtpAndEmail(String otpCode, String email);
+
+    Optional<UserOTP> findByOtpAndEmail(String otpCode, String email);
+
     void deleteByExpiryDateBefore(LocalDateTime expiryDate);
-    void deleteByEmail(String email);
+
+    void deleteAllByEmail(String email);
+
+    Boolean existsByOtp(String otp);
 
 }
