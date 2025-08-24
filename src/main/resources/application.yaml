@@ -32,8 +32,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
-  profiles:
-    active: local
+
   servlet:
     multipart:
       max-file-size: 5MB
