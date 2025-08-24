@@ -1,14 +1,16 @@
 package com.example.campuspulseai.domain.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
+@Data
 @AllArgsConstructor
-public class OrganizerResponse {
+@NoArgsConstructor
+public class GetUserResponse {
+    private Long id;
     private String firstName;
     private String lastName;
-    private Long id;
+    private String email;
 }
+

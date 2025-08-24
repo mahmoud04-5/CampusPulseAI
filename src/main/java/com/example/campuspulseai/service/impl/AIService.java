@@ -1,19 +1,14 @@
 package com.example.campuspulseai.service.impl;
-
-import com.example.campuspulseai.service.IAiService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
-public class AIService implements IAiService {
+public class AIService {
 
     private final ChatClient chatClient;
 
-    public AIService(ChatClient.Builder builder) {
-        chatClient = builder.build();
-    }
-
-    @Override
     public String chat(String prompt) {
         return chatClient
                 .prompt(prompt)

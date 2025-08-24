@@ -1,5 +1,6 @@
 package com.example.campuspulseai.domain.dto;
 
+import com.example.campuspulseai.southbound.entity.QuestionChoices;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,13 +15,6 @@ import java.util.List;
 public class SurveyQuestionDTO {
     private Long questionId;
     private String questionText;
-    private List<String> choices;
+    private List<QuestionChoices> choices;
     private List<Long> selectedChoicesIds;
-
-    public SurveyQuestionDTO(Long id, String questionText, List<Long> choiceIds) {
-        this.questionId = id;
-        this.questionText = questionText;
-        this.choices = null;
-        this.selectedChoicesIds = choiceIds;
-    }
 }

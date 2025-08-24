@@ -13,5 +13,4 @@ public class CreateClubResponse {
     private String description;
     private String logoUrl;
     private Boolean isActive;
-    private List<GetEventResponse> events;
 }

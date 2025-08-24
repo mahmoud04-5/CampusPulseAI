@@ -23,24 +23,24 @@ public class Club {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(name = "name",nullable = false, length = 255)
-    private String clubName;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-
 
     @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
     @Column(nullable = false)
-    private Boolean isActive = true;
+    private boolean isActive = true;
 
     @CreationTimestamp
     @Column(nullable = false)
     private Timestamp createdAt;
-
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
+
 }
+

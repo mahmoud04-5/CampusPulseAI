@@ -13,6 +13,8 @@ import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
@@ -22,18 +24,25 @@ public interface EventMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "timeDate", source = "request.startTime")
-    Event mapToClub(CreateEventRequest request);
+    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
+    Event mapToEvent(CreateEventRequest request);
 
-    @Mapping(target = "eventId", source = "event.id")
+    // Entity -> CreateEventResponse
+    @Mapping(target = "eventId", source = "id")
     CreateEventResponse mapToCreateEventResponse(Event event);
 
+    // Entity -> GetEventResponse
     @Mapping(target = "startTime", source = "event.timeDate")
-    GetEventResponse mapToEventResponseDetails(Event event);
+    @Mapping(target = "userAttending", source = "isAttending")
+    @Mapping(target = "totalAttendees", source = "event.totalAttendees")
+    GetEventResponse mapToEventResponseDetails(Event event, boolean isAttending);
 
+    // List<Entity> -> List<GetEventResponse>
+    List<GetEventResponse> mapToEventResponseDetailsList(List<Event> events);
+
+    // Edit Event -> Update Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "timeDate", source = "startTime")
-        // map only if not null
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 
     @Mapping(target = "id", ignore = true)
@@ -63,4 +72,7 @@ public interface EventMapper {
     default String mapCategory(String[] events) {
         return events.length > 2 ? events[2].trim() : null;
     }
+}
+
+    List<GetEventResponse> toGetEventResponseList(List<Event> byClubId);
 }

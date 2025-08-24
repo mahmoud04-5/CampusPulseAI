@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: CampusPulseAi
+
+  datasource:
+    url: jdbc:postgresql://10.0.10.7:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
+    username: postgres
+    password: qeema**123 #postgres
+    driver-class-name: org.postgresql.Driver
+
+

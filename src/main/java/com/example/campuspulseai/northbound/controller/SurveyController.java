@@ -16,8 +16,7 @@ import java.util.List;
 @RequestMapping("/api/surveys")
 public class SurveyController {
     private final ISurveyService surveyService;
-
-    @CrossOrigin(origins = "http://localhost:8080")
+    
     @Operation(summary = "Get Survey", description = "Retrieves the survey questions for the user.")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
