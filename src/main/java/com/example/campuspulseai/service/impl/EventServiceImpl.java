@@ -6,6 +6,7 @@ import com.example.campuspulseai.domain.dto.request.CreateEventRequest;
 import com.example.campuspulseai.domain.dto.request.EditEventRequest;
 import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
 import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.service.IEventService;
@@ -13,10 +14,7 @@ import com.example.campuspulseai.southbound.entity.*;
 import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.mapper.UserEventMapper;
 import com.example.campuspulseai.southbound.mapper.UserMapper;
-import com.example.campuspulseai.southbound.repository.IClubRepository;
-import com.example.campuspulseai.southbound.repository.IEventRepository;
-import com.example.campuspulseai.southbound.repository.ISuggestedUserEventsRepository;
-import com.example.campuspulseai.southbound.repository.IUserEventRepository;
+import com.example.campuspulseai.southbound.repository.*;
 import com.example.campuspulseai.southbound.specification.impl.EventSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -49,6 +47,7 @@ public class EventServiceImpl implements IEventService {
     private final IEventRecommendationService eventRecommendationService;
     private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
     private static final String EVENT_NOT_FOUND = "Event not found with id: ";
+    private final ISuggestedOrganizerEventsRepository suggestedOrganizerEventsRepository;
 
     @SneakyThrows
     @Override
@@ -135,8 +134,15 @@ public class EventServiceImpl implements IEventService {
     }
 
     @Override
-    public List<GetEventResponse> suggestEventsToCreate() {
-        return List.of();
+    @Transactional
+    public List<GetEventSuggestionResponse> suggestEventsToCreate() {
+        List<SuggestedOrganizerEvent> suggestedEvents = suggestedOrganizerEventsRepository.findAll();
+        if (suggestedEvents.isEmpty()) {
+            List<SuggestedOrganizerEvent> newSuggestions = eventRecommendationService.getSuggestedOrganizerEvents();
+            suggestedOrganizerEventsRepository.saveAll(newSuggestions);
+            return eventMapper.mapToGetEventSuggestionResponse(newSuggestions);
+        }
+        return eventMapper.mapToGetEventSuggestionResponse(suggestedEvents);
     }
 
     @Override
@@ -209,8 +215,8 @@ public class EventServiceImpl implements IEventService {
                 : LocalDateTime.now(ZoneId.of("Europe/Helsinki"));
 
         List<Event> events = (category != null && !category.isEmpty())
-                ? eventRepository.findByTimeDateAfterAndCategory(filterDate, category)
-                : eventRepository.findByTimeDateAfter(filterDate);
+                ? eventRepository.findByStartTimeAfterAndCategory(filterDate, category)
+                : eventRepository.findByStartTimeAfter(filterDate);
 
         User user = authUtils.getAuthenticatedUser();
 
