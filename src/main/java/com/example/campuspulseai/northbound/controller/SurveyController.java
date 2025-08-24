@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/surveys")
 public class SurveyController {
     private final ISurveyService surveyService;
-
+    
     @Operation(summary = "Get Survey", description = "Retrieves the survey questions for the user.")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -26,8 +26,8 @@ public class SurveyController {
 
     @Operation(summary = "Submit Survey", description = "Submits the user's responses to the survey.")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping()
-    public void submitSurvey(List<SurveyQuestionDTO> surveyResponses) {
+    @PostMapping("/submit")
+    public void submitSurvey(@RequestBody List<SurveyQuestionDTO> surveyResponses) {
         surveyService.submitSurveyResponse(surveyResponses);
     }
 
