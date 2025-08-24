@@ -54,7 +54,7 @@ public class EventServiceImpl implements IEventService {
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
         User user = authUtils.getAuthenticatedUser();
-        Event event = eventMapper.mapToEvent(createEventRequest);
+        Event event = eventMapper.mapToClub(createEventRequest);
 
         Club club = getClubByOwnerId(user.getId());
         event.setClub(club);
