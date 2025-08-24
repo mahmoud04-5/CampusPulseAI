@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.Impl;
+package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
@@ -9,6 +9,7 @@ import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.UserEventMapper;
 import com.example.campuspulseai.southbound.mapper.UserMapper;
 import com.example.campuspulseai.southbound.repository.*;
 import lombok.SneakyThrows;
@@ -26,13 +27,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +45,10 @@ public class EventServiceImpl implements IEventService {
     private final EventMapper eventMapper;
     private final EventSpecifications eventSpecifications;
     private final UserMapper userMapper;
+    private final UserEventMapper userEventMapper;
+    private static final String EVENT_NOT_FOUND = "Event not found with id: ";
+
+
 
     @SneakyThrows
     @Override
@@ -133,10 +137,9 @@ public class EventServiceImpl implements IEventService {
         List<UserEvent> userEvents = userEventRepository.findByUserId(user.getId());
 
         return userEvents.stream()
-                .map(userEvent -> {
-                    Event event = getEventFromDBById(userEvent.getEventId());
-                    return eventMapper.mapToEventResponseDetails(event);
-                })
+                .map(UserEvent::getEvent)
+                .filter(Objects::nonNull)
+                .map(event -> eventMapper.mapToEventResponseDetails(event, true))
                 .toList();
     }
 
@@ -146,14 +149,17 @@ public class EventServiceImpl implements IEventService {
     public void attendEvent(Long eventId) {
         User user = authUtils.getAuthenticatedUser();
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + eventId));
+        if (event.getTotalAttendees() >= event.getCapacity()) {
+            throw new RuntimeException("Event is full. Cannot RSVP.");
+        }
+        boolean alreadyAttending = userEventRepository.existsByUserIdAndEventId(user.getId(), eventId);
+        if (alreadyAttending) {
+            throw new RuntimeException("User already RSVP’d to this event.");
+        }
 
-        UserEvent userEvent = new UserEvent();
-        userEvent.setUserId(user.getId());
-        userEvent.setEventId(eventId);
-        userEvent.setUser(user);
-        userEvent.setEvent(event);
-        userEvent.setRsvpDateTime(LocalDateTime.now());
+        UserEvent userEvent = userEventMapper.toUserEvent(user, event);
+        event.setTotalAttendees(event.getTotalAttendees() + 1);
         userEventRepository.save(userEvent);
     }
 
@@ -161,8 +167,11 @@ public class EventServiceImpl implements IEventService {
     @Override
     public void unattendEvent(Long eventId) {
         User user = authUtils.getAuthenticatedUser();
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + eventId));
         UserEventId id = new UserEventId(user.getId(), eventId);
         userEventRepository.deleteById(id);
+        event.setTotalAttendees(event.getTotalAttendees() - 1);
     }
 
     @Override
@@ -178,6 +187,7 @@ public class EventServiceImpl implements IEventService {
     }
 
 
+    @SneakyThrows
     @Override
     public List<GetEventResponse> getUpcomingEvents(LocalDateTime startDate, String category) {
         LocalDateTime filterDate = (startDate != null)
@@ -188,17 +198,25 @@ public class EventServiceImpl implements IEventService {
                 ? eventRepository.findByTimeDateAfterAndCategory(filterDate, category)
                 : eventRepository.findByTimeDateAfter(filterDate);
 
-        return events.stream()
-                .map(eventMapper::mapToEventResponseDetails)
-                .toList();
+        User user = authUtils.getAuthenticatedUser();
 
+        return events.stream()
+                .map(event -> {
+                    boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), event.getId()));
+                    return eventMapper.mapToEventResponseDetails(event, isUserAttending);
+                })
+                .toList();
     }
 
 
+
+    @SneakyThrows
     @Override
     public GetEventResponse getEventDetails(Long id) {
         Event event = getEventFromDBById(id);
-        return eventMapper.mapToEventResponseDetails(event);
+        User user = authUtils.getAuthenticatedUser();
+        boolean isUserAttending = userEventRepository.existsById(new UserEventId(user.getId(), id));
+        return eventMapper.mapToEventResponseDetails(event, isUserAttending);
     }
 
 
@@ -207,7 +225,7 @@ public class EventServiceImpl implements IEventService {
     // ---------- Helper methods ----------
     private Event getEventFromDBById(Long id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + id));
     }
 
     private void validateUserClubOwnership(User user, Club club) {

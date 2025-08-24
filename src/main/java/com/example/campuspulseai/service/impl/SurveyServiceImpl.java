@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.Impl;
+package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.util.AuthUtils;
 import com.example.campuspulseai.domain.dto.SurveyQuestionDTO;
@@ -46,7 +46,7 @@ public class SurveyServiceImpl implements ISurveyService {
     @Override
     public List<SurveyQuestionDTO> getAllSurveyQuestions() {
         List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
-        return surveyQuestionMapper.toDtoList(surveyQuestions); // MapStruct handles the list
+        return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions);
     }
 
     // ---------- Helper methods ----------

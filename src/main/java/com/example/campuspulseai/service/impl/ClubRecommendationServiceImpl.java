@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.Impl;
+package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.service.IClubRecommendationService;
@@ -156,7 +156,7 @@ public class ClubRecommendationServiceImpl implements IClubRecommendationService
     }
 
     private List<GetClubResponse> mapClubsToDto(List<Club> clubs) {
-        return clubMapper.toDtoList(clubs);
+        return clubMapper.toGetClubResponse(clubs);
     }
 
     // ---------- Existing survey extraction logic ----------

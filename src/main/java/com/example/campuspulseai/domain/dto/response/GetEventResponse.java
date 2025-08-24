@@ -23,4 +23,6 @@ public class GetEventResponse {
     private String eventCategory;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private boolean isUserAttending;
+    private Integer totalAttendees;
 }

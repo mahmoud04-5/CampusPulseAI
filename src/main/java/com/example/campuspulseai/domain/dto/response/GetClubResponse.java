@@ -3,7 +3,6 @@ package com.example.campuspulseai.domain.dto.response;
 import lombok.*;
 
 import java.util.List;
-@Builder
 @Data
 public class GetClubResponse {
     private Long clubId;

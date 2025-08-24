@@ -22,10 +22,7 @@ public interface ClubMapper {
     GetClubResponse toDto(Club club);
     List<GetClubResponse> toDtoList(List<Club> clubs);
 
-    ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
 
-    @Mapping(source = "club.id", target = "clubId")
-    CreateClubResponse toCreateClubResponse(Club club);
 
     @Mapping(source = "club.id", target = "clubId")
     @Mapping(source = "club.owner.id", target = "organizerResponse.id")
@@ -41,4 +38,15 @@ public interface ClubMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")
     Club toClub(CreateClubRequest request, User user);
+    List<GetClubResponse> toGetClubResponse (List<Club> clubs);
+
+    ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
+
+    @Mapping(source = "club.id", target = "clubId")
+    CreateClubResponse toCreateClubResponse(Club club);
+
+
+
+
+
 }

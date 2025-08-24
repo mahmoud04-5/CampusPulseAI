@@ -12,24 +12,23 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    // ✅ Remove INSTANCE (Spring will inject the bean)
-    // EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
-
     // Create Event -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
-    Event mapToEvent(CreateEventRequest request);
+    @Mapping(target = "timeDate", source = "request.startTime")
+    Event mapToClub(CreateEventRequest request);
 
     // Entity -> CreateEventResponse
     @Mapping(target = "eventId", source = "id")
     CreateEventResponse mapToCreateEventResponse(Event event);
 
     // Entity -> GetEventResponse
-    @Mapping(target = "startTime", source = "timeDate")
-    GetEventResponse mapToEventResponseDetails(Event event);
+    @Mapping(target = "startTime", source = "event.timeDate")
+    @Mapping(target = "userAttending", source = "isAttending")
+    @Mapping(target = "totalAttendees", source = "event.totalAttendees")
+    GetEventResponse mapToEventResponseDetails(Event event, boolean isAttending);
 
     // List<Entity> -> List<GetEventResponse>
     List<GetEventResponse> mapToEventResponseDetailsList(List<Event> events);

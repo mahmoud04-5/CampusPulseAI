@@ -13,5 +13,5 @@ public interface SurveyQuestionMapper {
     @Mapping(target = "selectedChoicesIds", ignore = true)
     SurveyQuestionDTO toDto(SurveyQuestion surveyQuestion);
 
-    List<SurveyQuestionDTO> toDtoList(List<SurveyQuestion> surveyQuestions);
+    List<SurveyQuestionDTO> toSurveyQuestionDTOList(List<SurveyQuestion> surveyQuestions);
 }
