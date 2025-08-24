@@ -183,11 +183,11 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         List<SuggestedOrganizerEvent> events = new ArrayList<>();
 
         // Split the response into individual event strings
-        String[] eventStrings = response.split("@");
+        List<String> eventStrings = Arrays.stream(response.split("@")).toList();
 
         for (String eventString : eventStrings) {
-            String[] parts = eventString.split("&");
-            if (parts.length != 3) {
+            List<String> parts = Arrays.stream(eventString.split("&")).toList();
+            if (parts.size() != 3) {
                 throw new IllegalArgumentException("Invalid response format. Expected format: title&description&category");
             }
 

@@ -140,14 +140,9 @@ public class EventServiceImpl implements IEventService {
         if (suggestedEvents.isEmpty()) {
             List<SuggestedOrganizerEvent> newSuggestions = eventRecommendationService.getSuggestedOrganizerEvents();
             suggestedOrganizerEventsRepository.saveAll(newSuggestions);
-            return newSuggestions
-                    .stream()
-                    .map(eventMapper::mapToGetEventSuggestionResponse)
-                    .toList();
+            return eventMapper.mapToGetEventSuggestionResponse(newSuggestions);
         }
-        return suggestedEvents.stream()
-                .map(eventMapper::mapToGetEventSuggestionResponse)
-                .toList();
+        return eventMapper.mapToGetEventSuggestionResponse(suggestedEvents);
     }
 
     @Override

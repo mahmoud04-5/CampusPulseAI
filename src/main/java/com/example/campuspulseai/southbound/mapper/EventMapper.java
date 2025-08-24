@@ -50,10 +50,12 @@ public interface EventMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "title", expression = "java(events.getValues()[0].trim())")
-    @Mapping(target = "description", expression = "java(events.getValues()[1].trim())")
-    @Mapping(target = "category", expression = "java(events.getValues()[2].trim())")
+    @Mapping(target = "title", expression = "java(events.getValues().get(0).trim())")
+    @Mapping(target = "description", expression = "java(events.getValues().get(1).trim())")
+    @Mapping(target = "category", expression = "java(events.getValues().get(2).trim())")
     SuggestedOrganizerEvent mapToSuggestedOrganizerEvent(SuggestedEventParts events);
+
+    List<GetEventSuggestionResponse> mapToGetEventSuggestionResponse(List<SuggestedOrganizerEvent> suggestedOrganizerEvents);
 
     List<GetEventResponse> toGetEventResponseList(List<Event> byClubId);
 }
