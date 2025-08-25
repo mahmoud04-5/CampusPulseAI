@@ -90,6 +90,8 @@ public class ClubServiceImpl implements IClubService {
         }
     }
 
+
+
     @Override
     public Page<GetClubResponse> getClubs(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -106,6 +108,20 @@ public class ClubServiceImpl implements IClubService {
                 eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()))
         ));
     }
+
+    @Override
+    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+        User currentUser = authUtils.getAuthenticatedUser();
+        List<Club> clubs = clubRepository.findAllByOwnerId(currentUser.getId());
+
+        return clubs.stream()
+                .map(club -> clubMapper.toGetClubResponse(
+                        club,
+                        eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()))
+                ))
+                .toList();
+    }
+
 
     private void validateFirstClubCreation(User user) throws ResponseStatusException {
         Optional<Club> oldClub = clubRepository.findByOwnerId(user.getId());
