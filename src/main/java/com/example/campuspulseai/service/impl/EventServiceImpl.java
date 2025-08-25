@@ -50,7 +50,6 @@ public class EventServiceImpl implements IEventService {
     private final IEventAttendeesRepository eventAttendeesRepository;
 
 
-
     @SneakyThrows
     @Override
     public CreateEventResponse createEvent(CreateEventRequest createEventRequest) {
@@ -260,9 +259,12 @@ public class EventServiceImpl implements IEventService {
 
     // Helper
     private Event getEventFromDBById(Long id) {
-        return eventRepository.findById(id)
+        Specification<Event> spec = eventSpecifications.isActive()
+                .and(eventSpecifications.hasId(id));
+        return eventRepository.findOne(spec)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + id));
     }
+
 
     private void validateUserClubOwnership(User user, Club club) {
         if (!Objects.equals(club.getOwner().getId(), user.getId())) {

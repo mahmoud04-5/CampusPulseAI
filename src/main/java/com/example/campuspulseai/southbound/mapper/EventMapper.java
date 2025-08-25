@@ -22,7 +22,8 @@ public interface EventMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "timeDate", source = "startTime") // assuming DTO has startTime
+    @Mapping(target = "startTime", source = "startTime")
+    // assuming DTO has startTime
     Event mapToEvent(CreateEventRequest request);
 
     // Entity -> CreateEventResponse
@@ -30,7 +31,7 @@ public interface EventMapper {
     CreateEventResponse mapToCreateEventResponse(Event event);
 
     // Entity -> GetEventResponse
-    @Mapping(target = "startTime", source = "event.timeDate")
+    @Mapping(target = "startTime", source = "event.startTime")
     @Mapping(target = "userAttending", source = "isAttending")
     @Mapping(target = "totalAttendees", source = "event.totalAttendees")
     GetEventResponse mapToEventResponseDetails(Event event, boolean isAttending);
@@ -40,7 +41,7 @@ public interface EventMapper {
 
     // Edit Event -> Update Entity (partial update)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "timeDate", source = "startTime")
+    @Mapping(target = "startTime", source = "startTime")
     void mapToEventForEdit(EditEventRequest editEventRequest, @MappingTarget Event event);
 
     @Mapping(target = "id", ignore = true)
