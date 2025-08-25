@@ -11,6 +11,7 @@ import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 import com.example.campuspulseai.service.IEventRecommendationService;
 import com.example.campuspulseai.service.IEventService;
 import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventAttendeesMapper;
 import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.mapper.UserEventMapper;
 import com.example.campuspulseai.southbound.mapper.UserMapper;
@@ -48,6 +49,8 @@ public class EventServiceImpl implements IEventService {
     private final ISuggestedUserEventsRepository suggestedUserEventsRepository;
     private final ISuggestedOrganizerEventsRepository suggestedOrganizerEventsRepository;
     private static final String EVENT_NOT_FOUND = "Event not found with id: ";
+    private final EventAttendeesMapper eventAttendeesMapper;
+    private final IEventAttendeesRepository eventAttendeesRepository;
 
 
 
@@ -182,8 +185,10 @@ public class EventServiceImpl implements IEventService {
         }
 
         UserEvent userEvent = userEventMapper.toUserEvent(user, event);
+        EventAttendees attendees = eventAttendeesMapper.toEventAttendees(user,event);
         event.setTotalAttendees(event.getTotalAttendees() + 1);
         userEventRepository.save(userEvent);
+        eventAttendeesRepository.save(attendees);
     }
 
     @SneakyThrows
@@ -194,6 +199,11 @@ public class EventServiceImpl implements IEventService {
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + eventId));
         UserEventId id = new UserEventId(user.getId(), eventId);
         userEventRepository.deleteById(id);
+        EventAttendees attendee = eventAttendeesRepository
+                .findByUserIdAndEventId(user.getId(), eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found in event attendees."));
+        eventAttendeesRepository.delete(attendee);
+
         event.setTotalAttendees(event.getTotalAttendees() - 1);
     }
 
