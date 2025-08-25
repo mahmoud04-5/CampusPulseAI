@@ -15,6 +15,6 @@ import java.util.List;
 public class SurveyQuestionDTO {
     private Long questionId;
     private String questionText;
-    private List<QuestionChoices> choices;
+    private List<QuestionChoiceDTO> choices;
     private List<Long> selectedChoicesIds;
 }

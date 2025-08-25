@@ -39,6 +39,13 @@ public class SurveyServiceImpl implements ISurveyService {
     @Transactional
     public void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses) {
         User user = authUtils.getAuthenticatedUser();
+
+        if (surveyUserAnswersRepository.findByUserId(user.getId()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You have already submitted this survey.");
+        }
+
+        validateSurveyCompletion(surveyResponses);
+
         SurveyUserAnswers userAnswers = buildSurveyUserAnswers(user, surveyResponses);
         saveSurveyResponse(userAnswers);
     }
@@ -48,6 +55,14 @@ public class SurveyServiceImpl implements ISurveyService {
         List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAll();
         return surveyQuestionMapper.toSurveyQuestionDTOList(surveyQuestions);
     }
+
+    @Override
+    public List<SurveyQuestionDTO> getUserResponses(Long userId) {
+        Map<String, Object> questionAnswersMap = getQuestionAnswersForUser(userId);
+        List<SurveyQuestionDTO> allQuestions = getAllSurveyQuestionsAsDTO();
+        return populateUserResponses(allQuestions, questionAnswersMap);
+    }
+
 
     // ---------- Helper methods ----------
 
@@ -94,5 +109,58 @@ public class SurveyServiceImpl implements ISurveyService {
     protected void saveSurveyResponse(SurveyUserAnswers userAnswers) {
         surveyUserAnswersRepository.save(userAnswers);
     }
+
+    private List<Long> convertToLongList(List<Object> rawChoices) {
+        if (rawChoices == null) {
+            return null;
+        }
+        return rawChoices.stream()
+                .map(choice -> ((Number) choice).longValue())
+                .toList();
+    }
+
+    private List<SurveyQuestionDTO> populateUserResponses(List<SurveyQuestionDTO> dtos, Map<String, Object> userAnswersMap) {
+        for (SurveyQuestionDTO dto : dtos) {
+            String questionIdStr = String.valueOf(dto.getQuestionId());
+            if (userAnswersMap.containsKey(questionIdStr)) {
+                @SuppressWarnings("unchecked")
+                List<Object> rawChoices = (List<Object>) userAnswersMap.get(questionIdStr);
+                List<Long> selectedChoicesIds = convertToLongList(rawChoices);
+                dto.setSelectedChoicesIds(selectedChoicesIds);
+            }
+        }
+        return dtos;
+    }
+
+    private List<SurveyQuestionDTO> getAllSurveyQuestionsAsDTO() {
+        List<SurveyQuestion> allQuestions = surveyQuestionRepository.findAll();
+        return surveyQuestionMapper.toSurveyQuestionDTOList(allQuestions);
+    }
+
+    private Map<String, Object> getQuestionAnswersForUser(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found."));
+
+        Optional<SurveyUserAnswers> userAnswersOpt = surveyUserAnswersRepository.findByUserId(userId);
+        if (userAnswersOpt.isEmpty() || userAnswersOpt.get().getQuestionAnswers().isEmpty()) {
+            return new HashMap<>();
+        }
+        return userAnswersOpt.get().getQuestionAnswers();
+    }
+
+    private void validateSurveyCompletion(List<SurveyQuestionDTO> surveyResponses) {
+        long totalQuestionsCount = surveyQuestionRepository.count();
+
+        if (surveyResponses.size() != totalQuestionsCount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The survey must be answered completely. You must submit a response for all " + totalQuestionsCount + " questions.");
+        }
+
+        for (SurveyQuestionDTO response : surveyResponses) {
+            if (response.getSelectedChoicesIds() == null || response.getSelectedChoicesIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "All questions must be answered. Question with ID " + response.getQuestionId() + " has no answer.");
+            }
+        }
+    }
+
 
 }
