@@ -236,11 +236,12 @@ public class EventServiceImpl implements IEventService {
 
         return events.stream()
                 .map(event -> {
-                    boolean isUserAttending = eventAttendeesRepository.existsById(new UserEventId(user.getId(), event.getId()));
+                    boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(event.getId(), user.getId());
                     return eventMapper.mapToEventResponseDetails(event, isUserAttending);
                 })
                 .toList();
     }
+
 
 
 
@@ -249,9 +250,10 @@ public class EventServiceImpl implements IEventService {
     public GetEventResponse getEventDetails(Long id) {
         Event event = getEventFromDBById(id);
         User user = authUtils.getAuthenticatedUser();
-        boolean isUserAttending = eventAttendeesRepository.existsById(new UserEventId(user.getId(), id));
+        boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(id, user.getId());
         return eventMapper.mapToEventResponseDetails(event, isUserAttending);
     }
+
 
 
 
@@ -287,12 +289,13 @@ public class EventServiceImpl implements IEventService {
     private List<GetEventResponse> getEventResponsesFromSuggestedEvents(User user, List<Event> suggestedEvents, int limit) {
         return suggestedEvents.stream()
                 .map(event -> {
-                    boolean isUserAttending = eventAttendeesRepository.existsById(new UserEventId(user.getId(), event.getId()));
+                    boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(event.getId(), user.getId());
                     return eventMapper.mapToEventResponseDetails(event, isUserAttending);
                 })
                 .limit(limit)
                 .toList();
     }
+
 
     private List<Event> getAllEventsByIds(List<Long> eventIds) {
         return eventRepository.findAllById(eventIds).stream()
