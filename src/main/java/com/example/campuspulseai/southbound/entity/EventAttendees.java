@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Table(name = "event_attendees")
 @Entity
 @Data
@@ -29,4 +31,7 @@ public class EventAttendees {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
+
+    @Column(name = "rsvp_date_time", nullable = false)
+    private LocalDateTime rsvpDateTime = LocalDateTime.now();
 }
