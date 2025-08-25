@@ -113,13 +113,7 @@ public class ClubServiceImpl implements IClubService {
     public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
         User currentUser = authUtils.getAuthenticatedUser();
         List<Club> clubs = clubRepository.findAllByOwnerId(currentUser.getId());
-
-        return clubs.stream()
-                .map(club -> clubMapper.toGetClubResponse(
-                        club,
-                        eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()))
-                ))
-                .toList();
+        return clubMapper.toGetClubResponse(clubs);
     }
 
 
