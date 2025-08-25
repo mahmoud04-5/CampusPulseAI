@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 @Component
 public class EventSpecifications implements IEventSpecifications {
     private static final int DAYS = 90;
-    private static final String TIME_DATE = "timeDate";
+    private static final String TIME_DATE = "startTime";
+
+    @Override
+    public Specification<Event> hasId(Long id) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("id"), id);
+    }
 
     @Override
     public Specification<Event> hasClubId(Long clubId) {
