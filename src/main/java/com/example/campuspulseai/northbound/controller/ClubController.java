@@ -30,6 +30,7 @@ public class ClubController {
     private final IClubService clubService;
     private final IClubRecommendationService clubRecommendationService;
 
+    @CrossOrigin(origins = "*")
     @Operation(summary = "Create a new club", description = "Creates a new club with the provided details.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
