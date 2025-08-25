@@ -21,6 +21,6 @@ public class CloudinaryPathValidator implements ConstraintValidator<ValidCloudin
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return value != null && pattern.matcher(value).matches();
+        return value == null || pattern.matcher(value).matches();
     }
 }
