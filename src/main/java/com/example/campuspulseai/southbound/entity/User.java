@@ -57,7 +57,7 @@ public class User implements UserDetails {
 
 
     @OneToMany(mappedBy = "user")
-    private List<UserEvent> userAttendedEvents;
+    private List<EventAttendees> userAttendedEvents;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

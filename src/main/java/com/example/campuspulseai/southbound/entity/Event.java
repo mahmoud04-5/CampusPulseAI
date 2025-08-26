@@ -61,7 +61,7 @@ public class Event {
     private LocalDateTime startTime;
 
     @OneToMany(mappedBy = "event")
-    private List<UserEvent> attendees = new ArrayList<>();
+    private List<EventAttendees> attendees = new ArrayList<>();
 
     @Column(name = "totalattendees", nullable = false)
     private Integer totalAttendees = 0;
