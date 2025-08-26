@@ -1,5 +1,6 @@
 package com.example.campuspulseai.southbound.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +33,7 @@ public class SurveyQuestion {
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.EAGER)
-
+    @JsonManagedReference
     private List<QuestionChoices> choices;
 
     @CreationTimestamp
