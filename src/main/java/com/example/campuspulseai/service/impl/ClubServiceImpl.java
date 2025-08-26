@@ -80,7 +80,10 @@ public class ClubServiceImpl implements IClubService {
         Club club = findClubByIdOrThrow(id);
         validateClubOwnership(club, currentUser);
         clubRepository.delete(club);
+        currentUser.setGroup(new Group(1L, "GROUP_STUDENTS", null));
+        userRepository.save(currentUser);
     }
+
 
     private void validateClubOwnership(Club club, User currentUser) {
         if (!club.getOwner().getId().equals(currentUser.getId())) {

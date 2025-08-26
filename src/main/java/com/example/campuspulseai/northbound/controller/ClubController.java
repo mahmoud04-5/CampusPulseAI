@@ -5,6 +5,7 @@ import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
 import com.example.campuspulseai.domain.dto.response.GetClubProfileResponse;
 import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
+import com.example.campuspulseai.southbound.entity.User;
 import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -88,6 +90,7 @@ public class ClubController {
             summary = "Get clubs owned by the authenticated user",
             description = "Retrieves all clubs where the authenticated user is the owner."
     )
+    @PreAuthorize("hasRole('ORGANIZER')")
     @GetMapping("/owned")
     @ResponseStatus(HttpStatus.OK)
     public List<GetClubProfileResponse> getOwnedClubs() throws AccessDeniedException {

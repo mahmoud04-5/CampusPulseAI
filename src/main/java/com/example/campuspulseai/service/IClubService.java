@@ -7,6 +7,7 @@ import com.example.campuspulseai.domain.dto.response.GetClubProfileResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
 import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
 import com.example.campuspulseai.southbound.entity.Club;
+import com.example.campuspulseai.southbound.entity.User;
 import org.springframework.data.domain.Page;
 
 import java.nio.file.AccessDeniedException;
