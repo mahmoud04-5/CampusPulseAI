@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ISurveyService {
     List<SurveyQuestionDTO> getAllSurveyQuestions();
-
+    List<SurveyQuestionDTO> getUserResponses(Long userId);
     void submitSurveyResponse(List<SurveyQuestionDTO> surveyResponses);
 
 
