@@ -260,7 +260,9 @@ public class EventServiceImpl implements IEventService {
 
     // Helper
     private Event getEventFromDBById(Long id) {
-        return eventRepository.findById(id)
+        Specification<Event> spec = eventSpecifications.isActive()
+                .and(eventSpecifications.hasId(id));
+        return eventRepository.findOne(spec)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND + id));
     }
 
