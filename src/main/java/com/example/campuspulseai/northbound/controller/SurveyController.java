@@ -31,4 +31,10 @@ public class SurveyController {
         surveyService.submitSurveyResponse(surveyResponses);
     }
 
+    @Operation(summary = "Get User Survey Responses", description = "Retrieves the survey responses submitted by a specific user.")
+    @GetMapping("/user/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SurveyQuestionDTO> getUserSurveyResponses(@PathVariable Long userId) {
+        return surveyService.getUserResponses(userId);}
+
 }

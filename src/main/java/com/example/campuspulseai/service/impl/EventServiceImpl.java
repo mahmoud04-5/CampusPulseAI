@@ -168,7 +168,6 @@ public class EventServiceImpl implements IEventService {
     }
 
 
-
     @SneakyThrows
     @Override
     public void attendEvent(Long eventId) {
@@ -243,8 +242,6 @@ public class EventServiceImpl implements IEventService {
     }
 
 
-
-
     @SneakyThrows
     @Override
     public GetEventResponse getEventDetails(Long id) {
@@ -253,9 +250,6 @@ public class EventServiceImpl implements IEventService {
         boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(id, user.getId());
         return eventMapper.mapToEventResponseDetails(event, isUserAttending);
     }
-
-
-
 
 
     // Helper
@@ -291,13 +285,12 @@ public class EventServiceImpl implements IEventService {
     private List<GetEventResponse> getEventResponsesFromSuggestedEvents(User user, List<Event> suggestedEvents, int limit) {
         return suggestedEvents.stream()
                 .map(event -> {
-                    boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(event.getId(), user.getId());
+                    boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(user.getId(), event.getId());
                     return eventMapper.mapToEventResponseDetails(event, isUserAttending);
                 })
                 .limit(limit)
                 .toList();
     }
-
 
     private List<Event> getAllEventsByIds(List<Long> eventIds) {
         return eventRepository.findAllById(eventIds).stream()

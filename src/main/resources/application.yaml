@@ -1,10 +1,8 @@
 server:
   port: 8080
-
 spring:
   application:
     name: CampusPulseAi
-
 
   ai:
     openai:
@@ -15,7 +13,7 @@ spring:
     expiration: 86400000 # 1 day in ms
 
   datasource:
-    url: jdbc:postgresql://10.0.10.7:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
+    url: jdbc:postgresql://localhost:5432/campuspulseai   #jdbc:postgresql://localhost:3307/campus_pulse
     username: postgres
     password: qeema**123 #postgres
     driver-class-name: org.postgresql.Driver
@@ -61,4 +59,3 @@ cloudinary:
   api_key: 614467574267491
   api_secret: OqeWh56aS8q9ncVhmNB4enxNk4k
   url_pattern: ^https://res\.cloudinary\.com/dct8rg7di.*$
-
