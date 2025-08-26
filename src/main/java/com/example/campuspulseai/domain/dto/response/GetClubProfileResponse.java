@@ -12,5 +12,6 @@ public class GetClubProfileResponse {
     private String name;
     private String logoUrl;
     private String description;
+    private Boolean isActive;
     private List<GetEventResponse> events;
 }

@@ -2,10 +2,7 @@ package com.example.campuspulseai.southbound.mapper;
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
-import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetEventResponse;
-import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
+import com.example.campuspulseai.domain.dto.response.*;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.Mapper;
@@ -22,6 +19,8 @@ public interface ClubMapper {
     GetClubResponse toDto(Club club);
 
     List<GetClubResponse> toGetClubResponse(List<Club> clubs);
+
+    List<GetClubProfileResponse> toGetClubOwnerResponse(List<Club> clubs);
 
 
     @Mapping(source = "club.id", target = "clubId")

@@ -3,10 +3,7 @@ package com.example.campuspulseai.service.Impl;
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
-import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetEventResponse;
-import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
+import com.example.campuspulseai.domain.dto.response.*;
 import com.example.campuspulseai.service.IClubService;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.Group;
@@ -112,10 +109,10 @@ public class ClubServiceImpl implements IClubService {
     }
 
     @Override
-    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+    public List<GetClubProfileResponse> getOwnedClubs() throws AccessDeniedException {
         User currentUser = authUtils.getAuthenticatedUser();
         List<Club> clubs = clubRepository.findAllByOwnerId(currentUser.getId());
-        return clubMapper.toGetClubResponse(clubs);
+        return clubMapper.toGetClubOwnerResponse(clubs);
     }
 
 

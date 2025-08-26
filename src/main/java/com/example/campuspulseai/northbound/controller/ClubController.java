@@ -3,6 +3,7 @@ package com.example.campuspulseai.northbound.controller;
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
+import com.example.campuspulseai.domain.dto.response.GetClubProfileResponse;
 import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
 import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
@@ -89,7 +90,7 @@ public class ClubController {
     )
     @GetMapping("/owned")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+    public List<GetClubProfileResponse> getOwnedClubs() throws AccessDeniedException {
         return clubService.getOwnedClubs();
     }
 
