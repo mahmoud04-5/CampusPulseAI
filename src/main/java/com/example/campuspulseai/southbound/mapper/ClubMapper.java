@@ -26,6 +26,7 @@ public interface ClubMapper {
     @Mapping(source = "club.owner.id", target = "organizerResponse.id")
     @Mapping(source = "club.owner.firstName", target = "organizerResponse.firstName")
     @Mapping(source = "club.owner.lastName", target = "organizerResponse.lastName")
+    @Mapping(source = "events", target = "events")
     GetClubResponse toGetClubResponse(Club club, List<GetEventResponse> events);
 
 

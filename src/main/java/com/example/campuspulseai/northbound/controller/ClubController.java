@@ -66,10 +66,10 @@ public class ClubController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<GetClubResponse> getClubs(
-            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "clubName", required = false) String clubName,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return clubService.getClubs(query, page, size);
+        return clubService.getClubs(clubName, page, size);
     }
 
     @Operation(
@@ -80,6 +80,17 @@ public class ClubController {
     public ResponseEntity<List<GetClubResponse>> getRecommendationsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(clubRecommendationService.getRecommendationsForUser(userId));
     }
+
+    @Operation(
+            summary = "Get clubs owned by the authenticated user",
+            description = "Retrieves all clubs where the authenticated user is the owner."
+    )
+    @GetMapping("/owned")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+        return clubService.getOwnedClubs();
+    }
+
 
 
 }
