@@ -6,6 +6,8 @@ import com.example.campuspulseai.domain.dto.response.CreateEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetEventResponse;
 import com.example.campuspulseai.domain.dto.response.GetUserResponse;
 
+import com.example.campuspulseai.domain.dto.response.GetEventSuggestionResponse;
+import com.example.campuspulseai.southbound.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +28,7 @@ public interface IEventService {
 
     List<GetEventResponse> suggestEventsToAttend(int limit) throws Exception;
 
-    List<GetEventResponse> suggestEventsToCreate();
+    List<GetEventSuggestionResponse> suggestEventsToCreate();
 
     List<GetEventResponse> getEventsAttending();
 

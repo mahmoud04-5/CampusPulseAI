@@ -3,9 +3,11 @@ package com.example.campuspulseai.service;
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
+import com.example.campuspulseai.southbound.entity.Club;
 import org.springframework.data.domain.Page;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 
 public interface IClubService {
@@ -24,4 +26,7 @@ public interface IClubService {
 
     // This method retrieves a paginated list of clubs, optionally filtered by a search query.
     Page<GetClubResponse> getClubs(String query, int page, int size);
-}
+
+     List<GetClubResponse> getOwnedClubs() throws AccessDeniedException;
+    }
+

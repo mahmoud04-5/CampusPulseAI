@@ -9,26 +9,24 @@ import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ClubMapper {
+    @Mapping(source = "name", target = "name")
     @Mapping(source = "id", target = "clubId")
+    @Mapping(source = "description", target = "description")
     GetClubResponse toDto(Club club);
 
     List<GetClubResponse> toGetClubResponse(List<Club> clubs);
 
-    ClubMapper INSTANCE = Mappers.getMapper(ClubMapper.class);
-
-    @Mapping(source = "club.id", target = "clubId")
-    CreateClubResponse toCreateClubResponse(Club club);
 
     @Mapping(source = "club.id", target = "clubId")
     @Mapping(source = "club.owner.id", target = "organizerResponse.id")
     @Mapping(source = "club.owner.firstName", target = "organizerResponse.firstName")
     @Mapping(source = "club.owner.lastName", target = "organizerResponse.lastName")
+    @Mapping(source = "events", target = "events")
     GetClubResponse toGetClubResponse(Club club, List<GetEventResponse> events);
 
 
@@ -39,4 +37,10 @@ public interface ClubMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")
     Club toClub(CreateClubRequest request, User user);
+
+
+    @Mapping(source = "club.id", target = "clubId")
+    CreateClubResponse toCreateClubResponse(Club club);
+
+
 }

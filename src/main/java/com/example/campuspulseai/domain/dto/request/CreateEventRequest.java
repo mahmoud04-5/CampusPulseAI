@@ -1,5 +1,6 @@
 package com.example.campuspulseai.domain.dto.request;
 
+import com.example.campuspulseai.common.validation.ValidCloudinaryPath;
 import com.example.campuspulseai.domain.validation.ValidCategory;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,6 @@ public class CreateEventRequest {
     @NotNull(message = "Event category is required")
     private String category;
 
-
+    @ValidCloudinaryPath
     private String imageUrl;
 }
