@@ -1,8 +1,10 @@
 package com.example.campuspulseai.service;
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
+import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
+import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
 import com.example.campuspulseai.southbound.entity.Club;
 import org.springframework.data.domain.Page;
 
@@ -20,7 +22,7 @@ public interface IClubService {
 
     // Updates an existing club (edit information). This method should be for the organizer CreateClubResponse updateClub(CreateClubResponse updateClubRequest);
 
-    CreateClubResponse updateClub(Long id, CreateClubRequest updateClubRequest) throws AccessDeniedException;
+    UpdateClubResponse updateClub(Long id, UpdateClubRequest updateClubRequest) throws AccessDeniedException;
     // Deletes a club.This method should be for the organizer
     void deleteClubById(Long id) throws AccessDeniedException;
 

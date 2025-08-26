@@ -2,6 +2,8 @@ package com.example.campuspulseai.northbound.controller;
 
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
+import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
+import com.example.campuspulseai.domain.dto.response.UpdateClubResponse;
 import org.springframework.http.ResponseEntity;
 import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
 import com.example.campuspulseai.domain.dto.response.GetClubResponse;
@@ -49,7 +51,7 @@ public class ClubController {
     @Operation(summary = "Update club by ID", description = "Updates an existing club's information.")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    CreateClubResponse updateClub(@PathVariable Long id,@Valid @RequestBody CreateClubRequest updateClubRequest) throws AccessDeniedException {
+    UpdateClubResponse updateClub(@PathVariable Long id, @Valid @RequestBody UpdateClubRequest updateClubRequest) throws AccessDeniedException {
         return clubService.updateClub(id, updateClubRequest);
     }
 
