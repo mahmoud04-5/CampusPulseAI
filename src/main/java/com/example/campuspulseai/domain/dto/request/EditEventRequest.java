@@ -1,6 +1,7 @@
 package com.example.campuspulseai.domain.dto.request;
 
 import com.example.campuspulseai.common.validation.ValidCategoryNullable;
+import com.example.campuspulseai.common.validation.ValidCloudinaryPath;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -34,5 +35,6 @@ public class EditEventRequest {
     @ValidCategoryNullable
     private String category;
 
+    @ValidCloudinaryPath
     private String imageUrl;
 }

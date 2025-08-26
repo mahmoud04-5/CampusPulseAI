@@ -2,11 +2,11 @@ package com.example.campuspulseai.service.impl;
 
 import com.example.campuspulseai.common.exception.ResourceNotFoundException;
 import com.example.campuspulseai.common.util.IAuthUtils;
+import com.example.campuspulseai.domain.dto.SuggestedEventParts;
 import com.example.campuspulseai.service.IEventRecommendationService;
-import com.example.campuspulseai.southbound.entity.Event;
-import com.example.campuspulseai.southbound.entity.QuestionChoices;
-import com.example.campuspulseai.southbound.entity.SurveyQuestion;
-import com.example.campuspulseai.southbound.entity.SurveyUserAnswers;
+import com.example.campuspulseai.southbound.Enum.Category;
+import com.example.campuspulseai.southbound.entity.*;
+import com.example.campuspulseai.southbound.mapper.EventMapper;
 import com.example.campuspulseai.southbound.repository.IEventRepository;
 import com.example.campuspulseai.southbound.repository.IQuestionChoicesRepository;
 import com.example.campuspulseai.southbound.repository.ISurveyQuestionRepository;
@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,6 +31,7 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
     private final AIService aiService;
     private final IEventRepository eventRepository;
     private final IEventSpecifications eventSpecifications;
+    private final EventMapper eventMapper;
 
     @Override
     public List<Long> getRecommendedEventIds(Long userId) {
@@ -52,6 +55,22 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
 
     }
 
+    public List<SuggestedOrganizerEvent> getSuggestedOrganizerEvents() {
+        List<SurveyUserAnswers> allUserAnswers = surveyUserAnswersRepository.findAll();
+        List<SurveyQuestion> questions = surveyQuestionRepository.findAll();
+        List<QuestionChoices> choices = questionChoicesRepository.findAll();
+
+        String prompt = buildEventRecommendationPromptForOrganizers(
+                questions,
+                choices,
+                allUserAnswers,
+                Arrays.stream(Category.values()).toList());
+
+        String response = aiService.chat(prompt);
+
+        return splitSuggestedEventsForCreationResponse(response);
+    }
+
     private String buildEventRecommendationPrompt(List<SurveyQuestion> questions, List<QuestionChoices> choices, SurveyUserAnswers userAnswers, List<Event> events) {
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("You are an event recommendation system.\n");
@@ -66,6 +85,35 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         promptBuilder.append("### Task:\n")
                 .append("Based on the survey answers, recommend 5 events that best fit this user.\n")
                 .append("Return ONLY the event IDs as a comma-separated list, no explanations.\n");
+
+        return promptBuilder.toString();
+    }
+
+    private String buildEventRecommendationPromptForOrganizers(List<SurveyQuestion> questions,
+                                                               List<QuestionChoices> choices,
+                                                               List<SurveyUserAnswers> userAnswers,
+                                                               List<Category> categories) {
+        StringBuilder promptBuilder = new StringBuilder();
+
+        promptBuilder.append("You are an event recommendation assistant.\n")
+                .append("The goal is to generate 3 creative event ideas that best match the user's survey answers.\n")
+                .append("Each event idea must contain:\n")
+                .append("- a short engaging TITLE\n")
+                .append("- a concise DESCRIPTION (1–2 sentences)\n")
+                .append("- the most relevant CATEGORY (chosen strictly from the provided enum categories)\n\n");
+
+
+        appendSurveyQuestionsAndChoices(promptBuilder, questions, choices);
+        appendUserAnswersList(promptBuilder, userAnswers);
+        appendCategoryEnum(promptBuilder, categories);
+
+        promptBuilder.append("### Task:\n")
+                .append("Based on the survey answers, suggest 3 new event ideas.\n")
+                .append("Return the result STRICTLY in the format:\n")
+                .append("title&description&category@title&description&category@title&description&category\n")
+                .append("DO NOT forget the format separate the 3 suggested event objects with '&' and separate the suggested events with '@'\n")
+                .append("do not include At('@') or ampersands('&') in the title, description, or category.\n")
+                .append("Do not include explanations or any extra text.\n");
 
         return promptBuilder.toString();
     }
@@ -130,4 +178,46 @@ public class EventRecommendationServiceImpl implements IEventRecommendationServi
         return surveyUserAnswersRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("No survey answers found for user ID: " + userId));
     }
+
+    private List<SuggestedOrganizerEvent> splitSuggestedEventsForCreationResponse(String response) {
+        List<SuggestedOrganizerEvent> events = new ArrayList<>();
+
+        // Split the response into individual event strings
+        List<String> eventStrings = Arrays.stream(response.split("@")).toList();
+
+        for (String eventString : eventStrings) {
+            List<String> parts = Arrays.stream(eventString.split("&")).toList();
+            if (parts.size() != 3) {
+                throw new IllegalArgumentException("Invalid response format. Expected format: title&description&category");
+            }
+
+            events.add(eventMapper.mapToSuggestedOrganizerEvent(new SuggestedEventParts(parts)));
+        }
+        return events;
+    }
+
+    private void appendUserAnswersList(StringBuilder promptBuilder, List<SurveyUserAnswers> userAnswers) {
+        // Append user answers
+        promptBuilder.append("\n### User Answers:\n[");
+        for (SurveyUserAnswers ans : userAnswers) {
+            promptBuilder.append(ans.getQuestionAnswers()).append(", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length()); // remove trailing comma
+        }
+        promptBuilder.append("]\n\n");
+    }
+
+    private void appendCategoryEnum(StringBuilder promptBuilder, List<Category> categories) {
+        // Append enum categories
+        promptBuilder.append("### Event Categories (enum values):\n[");
+        for (Category c : categories) {
+            promptBuilder.append("\"").append(c.getCategory()).append("\", ");
+        }
+        if (promptBuilder.charAt(promptBuilder.length() - 2) == ',') {
+            promptBuilder.delete(promptBuilder.length() - 2, promptBuilder.length());
+        }
+        promptBuilder.append("]\n\n");
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.campuspulseai.service.impl;
+package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
@@ -90,6 +90,8 @@ public class ClubServiceImpl implements IClubService {
         }
     }
 
+
+
     @Override
     public Page<GetClubResponse> getClubs(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -106,6 +108,14 @@ public class ClubServiceImpl implements IClubService {
                 eventMapper.toGetEventResponseList(eventRepository.findByClubId(club.getId()))
         ));
     }
+
+    @Override
+    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+        User currentUser = authUtils.getAuthenticatedUser();
+        List<Club> clubs = clubRepository.findAllByOwnerId(currentUser.getId());
+        return clubMapper.toGetClubResponse(clubs);
+    }
+
 
     private void validateFirstClubCreation(User user) throws ResponseStatusException {
         Optional<Club> oldClub = clubRepository.findByOwnerId(user.getId());

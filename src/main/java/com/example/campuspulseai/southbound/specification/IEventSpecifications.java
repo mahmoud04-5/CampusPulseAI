@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 public interface IEventSpecifications {
 
+    Specification<Event> hasId(Long id);
+
     Specification<Event> hasClubId(Long clubId);
 
     Specification<Event> isActive();
