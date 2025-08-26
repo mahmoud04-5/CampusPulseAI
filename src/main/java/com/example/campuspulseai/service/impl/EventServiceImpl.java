@@ -286,7 +286,6 @@ public class EventServiceImpl implements IEventService {
         return suggestedEvents.stream()
                 .map(event -> {
                     boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(user.getId(), event.getId());
-                    boolean isUserAttending = eventAttendeesRepository.existsByUserIdAndEventId(event.getId(), user.getId());
                     return eventMapper.mapToEventResponseDetails(event, isUserAttending);
                 })
                 .limit(limit)
