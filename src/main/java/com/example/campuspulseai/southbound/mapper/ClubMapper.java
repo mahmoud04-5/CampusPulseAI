@@ -1,9 +1,8 @@
 package com.example.campuspulseai.southbound.mapper;
 
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
-import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
+import com.example.campuspulseai.domain.dto.response.*;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.User;
 import org.mapstruct.Mapper;
@@ -21,6 +20,8 @@ public interface ClubMapper {
 
     List<GetClubResponse> toGetClubResponse(List<Club> clubs);
 
+    List<GetClubProfileResponse> toGetClubOwnerResponse(List<Club> clubs);
+
 
     @Mapping(source = "club.id", target = "clubId")
     @Mapping(source = "club.owner.id", target = "organizerResponse.id")
@@ -29,14 +30,19 @@ public interface ClubMapper {
     @Mapping(source = "events", target = "events")
     GetClubResponse toGetClubResponse(Club club, List<GetEventResponse> events);
 
-
-    void updateClubFromRequest(CreateClubRequest request, @MappingTarget Club club);
+    @Mapping(source = "clubName", target = "name")
+    @Mapping(source = "clubDescription", target = "description")
+    @Mapping(source = "logoUrl", target = "logoUrl")
+    void updateClubFromRequest(UpdateClubRequest request, @MappingTarget Club club);
 
     @Mapping(source = "request.clubName", target = "name")
     @Mapping(source = "request.clubDescription", target = "description")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", source = "user")
     Club toClub(CreateClubRequest request, User user);
+
+    UpdateClubResponse toUpdateClubResponse(Club club);
+
 
 
     @Mapping(source = "club.id", target = "clubId")
