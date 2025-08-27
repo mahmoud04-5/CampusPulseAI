@@ -2,9 +2,8 @@ package com.example.campuspulseai.service.Impl;
 
 import com.example.campuspulseai.common.util.IAuthUtils;
 import com.example.campuspulseai.domain.dto.request.CreateClubRequest;
-import com.example.campuspulseai.domain.dto.response.CreateClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetClubResponse;
-import com.example.campuspulseai.domain.dto.response.GetEventResponse;
+import com.example.campuspulseai.domain.dto.request.UpdateClubRequest;
+import com.example.campuspulseai.domain.dto.response.*;
 import com.example.campuspulseai.service.IClubService;
 import com.example.campuspulseai.southbound.entity.Club;
 import com.example.campuspulseai.southbound.entity.Group;
@@ -65,13 +64,13 @@ public class ClubServiceImpl implements IClubService {
     }
 
     @Override
-    public CreateClubResponse updateClub(Long id, CreateClubRequest updateClubRequest) throws AccessDeniedException {
+    public UpdateClubResponse updateClub(Long id, UpdateClubRequest updateClubRequest) throws AccessDeniedException {
         User currentUser = authUtils.getAuthenticatedUser();
         Club club = findClubByIdOrThrow(id);
         validateClubOwnership(club, currentUser);
         clubMapper.updateClubFromRequest(updateClubRequest, club);
         Club updatedClub = clubRepository.save(club);
-        return clubMapper.toCreateClubResponse(updatedClub);
+        return clubMapper.toUpdateClubResponse(updatedClub);
     }
 
 
@@ -81,7 +80,10 @@ public class ClubServiceImpl implements IClubService {
         Club club = findClubByIdOrThrow(id);
         validateClubOwnership(club, currentUser);
         clubRepository.delete(club);
+        currentUser.setGroup(new Group(1L, "GROUP_STUDENTS", null));
+        userRepository.save(currentUser);
     }
+
 
     private void validateClubOwnership(Club club, User currentUser) {
         if (!club.getOwner().getId().equals(currentUser.getId())) {
@@ -110,10 +112,10 @@ public class ClubServiceImpl implements IClubService {
     }
 
     @Override
-    public List<GetClubResponse> getOwnedClubs() throws AccessDeniedException {
+    public List<GetClubProfileResponse> getOwnedClubs() throws AccessDeniedException {
         User currentUser = authUtils.getAuthenticatedUser();
         List<Club> clubs = clubRepository.findAllByOwnerId(currentUser.getId());
-        return clubMapper.toGetClubResponse(clubs);
+        return clubMapper.toGetClubOwnerResponse(clubs);
     }
 
 
